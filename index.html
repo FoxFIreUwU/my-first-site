@@ -27,6 +27,14 @@
   body { overflow-x: hidden; scroll-behavior: smooth; }
   ::selection { background: var(--fire-2); color: #fff; }
 
+  .boop-target, .uwu-trigger,
+  #boop, #boop *, #uwu, #uwu * {
+    -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+    -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+  }
+  .boop-target::selection, .uwu-trigger::selection,
+  #boop ::selection, #uwu ::selection { background: transparent; color: inherit; }
+
   /* ───────── Background ambient ───────── */
   .bg-ambient {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -119,8 +127,12 @@
   .brand {
     display: flex; align-items: center; gap: 12px;
     font-family: 'Unbounded', sans-serif; font-weight: 800; letter-spacing: 0.02em;
+    background: transparent; border: 0; padding: 0; color: inherit;
+    cursor: pointer; transition: transform 0.3s cubic-bezier(.2,1.4,.3,1);
   }
-  .brand-glyph {
+  .brand:hover { transform: translateY(-2px); }
+  .brand:hover .brand-glyph { box-shadow: 0 8px 32px rgba(255,94,31,0.6); transform: rotate(-6deg); }
+  .brand-glyph { transition: all 0.4s cubic-bezier(.2,1.4,.3,1); }
     width: 34px; height: 34px; border-radius: 10px;
     background: linear-gradient(140deg, var(--fire-1), var(--fire-3));
     display: grid; place-items: center; color: #1a0a0c; font-weight: 900;
@@ -128,6 +140,60 @@
   }
   .brand-name { font-size: 16px; }
   .brand-name span { color: var(--fire-1); }
+
+  /* Game link pill */
+  .game-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255,94,31,0.16), rgba(255,45,85,0.16));
+    border: 1px solid rgba(255,154,60,0.35);
+    color: var(--fire-1); text-decoration: none;
+    font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(.2,1.4,.3,1);
+    backdrop-filter: blur(14px);
+  }
+  .game-link:hover {
+    background: linear-gradient(135deg, var(--fire-2), var(--fire-3));
+    color: #fff; border-color: transparent;
+    transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,94,31,0.4);
+  }
+  .game-link svg { width: 16px; height: 16px; }
+  @media (max-width: 640px) {
+    .game-link span { display: none; }
+    .game-link { padding: 8px 10px; }
+  }
+
+  /* PROGDY link inside text */
+  .progdy-link {
+    color: var(--fire-1); text-decoration: none; font-weight: 700;
+    border-bottom: 1px solid rgba(255,154,60,0.35);
+    transition: all 0.25s ease; padding-bottom: 1px;
+  }
+  .progdy-link:hover { color: var(--fire-4); border-bottom-color: var(--fire-4); text-shadow: 0 0 12px rgba(255,210,138,0.5); }
+
+  /* Scroll-to-top */
+  .to-top {
+    position: fixed; right: 28px; bottom: 28px; z-index: 40;
+    width: 52px; height: 52px; border-radius: 50%; border: 0;
+    background: linear-gradient(140deg, var(--fire-2), var(--fire-3));
+    color: #fff; cursor: pointer;
+    display: grid; place-items: center;
+    box-shadow: 0 10px 30px rgba(255,94,31,0.45), 0 0 0 1px rgba(255,255,255,0.08) inset;
+    opacity: 0; transform: translateY(20px) scale(0.85); pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(.2,1.4,.3,1), box-shadow 0.3s ease;
+  }
+  .to-top.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+  .to-top:hover { box-shadow: 0 12px 40px rgba(255,94,31,0.7); transform: translateY(-4px) scale(1.06); }
+  .to-top::before {
+    content: ''; position: absolute; inset: -6px; border-radius: 50%;
+    border: 1px solid rgba(255,94,31,0.4); animation: ringPulse 2.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .to-top svg { width: 22px; height: 22px; }
+  @media (max-width: 640px) {
+    .to-top { right: 18px; bottom: 18px; width: 46px; height: 46px; }
+  }
 
   .lang-switch {
     display: flex; gap: 4px; padding: 5px;
@@ -394,6 +460,18 @@
     transition: all 0.3s ease;
   }
   .bio-stat:hover { border-color: rgba(255,94,31,0.45); background: rgba(255,94,31,0.05); transform: translateY(-2px); }
+  .bio-stat-link {
+    color: inherit; text-decoration: none; display: block;
+    position: relative; cursor: pointer;
+  }
+  .bio-stat-link::after {
+    content: ''; position: absolute; top: 14px; right: 14px;
+    width: 14px; height: 14px;
+    background: no-repeat center / contain;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff9a3c' stroke-width='2' stroke-linecap='round'><path d='M7 17L17 7M9 7h8v8'/></svg>");
+    opacity: 0.45; transition: all 0.3s ease;
+  }
+  .bio-stat-link:hover::after { opacity: 1; transform: translate(2px,-2px); }
   .bio-stat-icon {
     width: 28px; height: 28px; display: grid; place-items: center;
     color: var(--fire-1); margin-bottom: 10px;
@@ -508,7 +586,7 @@
     100% { transform: scale(1.4) rotate(0deg); opacity: 0; }
   }
   .boop-sub {
-    position: absolute; bottom: 38%; font-family: 'Unbounded', sans-serif;
+    position: absolute; bottom: 15%; font-family: 'Unbounded', sans-serif;
     font-weight: 700; font-size: 14px; letter-spacing: 0.6em; color: var(--fire-4);
     opacity: 0; text-transform: uppercase;
   }
@@ -532,6 +610,216 @@
   [data-reveal][data-delay="4"] { transition-delay: 0.4s; }
   [data-reveal][data-delay="5"] { transition-delay: 0.5s; }
 
+  /* ───────── Social Credit meme (green) ───────── */
+  #socred {
+    position: fixed; inset: 0; z-index: 1001;
+    background:
+      radial-gradient(ellipse at 30% 40%, #2da94a 0%, #1f7a36 55%, #0e3c1c 100%);
+    opacity: 0; pointer-events: none;
+    overflow: hidden;
+    -webkit-user-select: none; user-select: none;
+    font-family: 'Manrope', sans-serif;
+    transition: background 0.3s ease;
+  }
+  /* Red variant background */
+  #socred.is-bad {
+    background:
+      radial-gradient(ellipse at 30% 40%, #e52828 0%, #a40d0d 55%, #2e0408 100%);
+  }
+  /* Variant visibility */
+  .sc-bad { display: none; }
+  #socred.is-bad .sc-good { display: none; }
+  #socred.is-bad .sc-bad { display: revert; }
+  #socred.is-bad svg.sc-bad,
+  #socred.is-bad div.sc-bad { display: block; }
+  #socred.is-bad .sc-tag.sc-bad { display: inline-flex; }
+  #socred.is-bad .sc-tag-dot { background: #ffd633; }
+  /* Tag dot color flip */
+  #socred.is-bad .sc-tag-dot { background: #fff2a8; box-shadow: 0 0 10px #fff2a8; }
+  /* Stamp tweaks in bad mode */
+  #socred.is-bad .sc-stamp { color: #fff2a8; border-color: #fff2a8; }
+  /* Plus number in bad mode — long number, smaller */
+  .sc-plus.sc-bad {
+    font-size: clamp(40px, 7vw, 110px);
+    letter-spacing: -0.04em;
+  }
+  /* Arrow size + color in bad mode */
+  .sc-arrow.sc-bad { width: clamp(80px, 12vw, 160px); }
+  #socred ::selection { background: transparent; color: inherit; }
+  #socred.show { opacity: 1; pointer-events: auto; }
+
+  .sc-flash {
+    position: absolute; inset: 0; background: #fff;
+    opacity: 0; pointer-events: none; mix-blend-mode: screen;
+  }
+  #socred.show .sc-flash { animation: scFlash 0.5s ease-out forwards; }
+  @keyframes scFlash {
+    0%   { opacity: 0; }
+    10%  { opacity: 0.85; }
+    100% { opacity: 0; }
+  }
+
+  /* Subtle paper-noise texture overlay */
+  .sc-texture {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.08;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  /* Vignette to focus center */
+  #socred::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.45) 100%);
+  }
+
+  /* Composition frame */
+  .sc-frame {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(1280px, 92vw); height: min(640px, 86vh);
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    align-items: center;
+    gap: clamp(20px, 4vw, 60px);
+    padding: clamp(20px, 4vw, 50px);
+    z-index: 2;
+  }
+  @media (max-width: 760px) {
+    .sc-frame { grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 20px; }
+    .sc-left { order: 2; }
+    .sc-right { order: 1; }
+  }
+
+  /* LEFT — Arrow, +1000, Social Credit */
+  .sc-left {
+    display: flex; flex-direction: column; align-items: flex-start;
+    color: #fff; position: relative;
+  }
+  .sc-arrow {
+    width: clamp(80px, 12vw, 160px); height: auto; margin-bottom: 18px;
+    opacity: 0;
+  }
+  #socred.show .sc-arrow { animation: scArrowIn 1s cubic-bezier(.16,1.6,.3,1) forwards 0.2s; }
+  @keyframes scArrowIn {
+    0%   { opacity: 0; transform: translateY(80px) scale(0.4); }
+    60%  { opacity: 1; transform: translateY(-12px) scale(1.05); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .sc-plus {
+    font-family: 'Unbounded', sans-serif; font-weight: 900;
+    font-size: clamp(80px, 13vw, 200px); line-height: 0.95;
+    letter-spacing: -0.04em; color: #fff;
+    text-shadow:
+      0 4px 0 rgba(0,0,0,0.18),
+      0 12px 30px rgba(0,0,0,0.35);
+    opacity: 0;
+  }
+  #socred.show .sc-plus { animation: scPlusIn 0.9s cubic-bezier(.2,1.5,.3,1) forwards 0.35s; }
+  @keyframes scPlusIn {
+    0%   { opacity: 0; transform: translateX(-60px) scale(0.7); }
+    60%  { opacity: 1; transform: translateX(0) scale(1.08); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+  }
+
+  .sc-title {
+    font-family: 'Unbounded', sans-serif; font-weight: 800;
+    font-size: clamp(28px, 4.5vw, 64px); line-height: 1; letter-spacing: -0.01em;
+    color: #fff; margin-top: 6px;
+    text-shadow: 0 4px 18px rgba(0,0,0,0.3);
+    opacity: 0;
+  }
+  #socred.show .sc-title { animation: scTitleIn 0.9s cubic-bezier(.2,1.5,.3,1) forwards 0.55s; }
+  @keyframes scTitleIn {
+    0%   { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Tag pill */
+  .sc-tag {
+    margin-top: 22px;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px;
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3);
+    font-family: 'Unbounded', sans-serif; font-weight: 700;
+    font-size: clamp(10px, 1.1vw, 12px); letter-spacing: 0.25em;
+    text-transform: uppercase; color: #fff;
+    opacity: 0; backdrop-filter: blur(6px);
+  }
+  .sc-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: #ffd633; box-shadow: 0 0 10px #ffd633; }
+  #socred.show .sc-tag { animation: scTitleIn 0.8s ease-out forwards 0.85s; }
+
+  /* RIGHT — character + chinese text */
+  .sc-right {
+    position: relative; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .sc-cn {
+    font-family: 'Unbounded', sans-serif; font-weight: 800;
+    font-size: clamp(48px, 8vw, 120px); line-height: 1;
+    color: #fff; margin-bottom: 24px; letter-spacing: 0.05em;
+    text-shadow: 0 6px 0 rgba(0,0,0,0.18), 0 14px 40px rgba(0,0,0,0.4);
+    opacity: 0; white-space: nowrap;
+  }
+  #socred.show .sc-cn { animation: scCNIn 1s cubic-bezier(.16,1.6,.3,1) forwards 0.45s; }
+  @keyframes scCNIn {
+    0%   { opacity: 0; transform: translateY(-60px) scale(0.6) rotate(-8deg); letter-spacing: 1em; }
+    50%  { opacity: 1; transform: translateY(0) scale(1.1) rotate(2deg); letter-spacing: 0.05em; }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); letter-spacing: 0.05em; }
+  }
+
+  .sc-mascot {
+    width: clamp(160px, 22vw, 320px); height: auto;
+    filter: drop-shadow(0 12px 28px rgba(0,0,0,0.35));
+    opacity: 0; transform-origin: center bottom;
+  }
+  #socred.show .sc-mascot { animation: scMascotIn 1.1s cubic-bezier(.16,1.6,.3,1) forwards 0.7s, scMascotBob 1.4s ease-in-out infinite 1.8s; }
+  @keyframes scMascotIn {
+    0%   { opacity: 0; transform: translateY(80px) scale(0.5) rotate(-10deg); }
+    60%  { opacity: 1; transform: translateY(-10px) scale(1.05) rotate(3deg); }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+  }
+  @keyframes scMascotBob {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-8px) rotate(1deg); }
+  }
+
+  /* Sparkle confetti */
+  .sc-confetti {
+    position: absolute; pointer-events: none; opacity: 0;
+    width: 14px; height: 14px;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.6));
+  }
+
+  /* Verified stamp in corner */
+  .sc-stamp {
+    position: absolute; right: 4%; bottom: 6%;
+    font-family: 'Unbounded', sans-serif; font-weight: 800;
+    font-size: clamp(10px, 1.2vw, 13px); letter-spacing: 0.32em;
+    color: #ffd633; text-transform: uppercase;
+    padding: 10px 18px; border: 2px solid #ffd633;
+    border-radius: 4px;
+    opacity: 0; transform: rotate(-8deg);
+    z-index: 3;
+  }
+  .sc-stamp-cn { display: block; font-size: 1.4em; letter-spacing: 0.3em; margin-bottom: 4px; }
+  #socred.show .sc-stamp {
+    animation:
+      scStampIn 0.5s cubic-bezier(.16,2,.3,1) forwards 1.4s,
+      scFinalFade 0.5s ease-in forwards 3.2s;
+  }
+  @keyframes scStampIn {
+    0%   { opacity: 0; transform: rotate(-25deg) scale(2); }
+    60%  { opacity: 1; transform: rotate(-6deg) scale(0.95); }
+    100% { opacity: 0.95; transform: rotate(-8deg) scale(1); }
+  }
+
+  /* Final fade for non-stamp elements */
+  #socred.show > .sc-frame,
+  #socred.show > .sc-texture {
+    animation: scFinalFade 0.5s ease-in forwards 3.2s;
+  }
+  @keyframes scFinalFade { to { opacity: 0; } }
+
   /* Cursor trail dot */
   .trail-dot {
     position: fixed; width: 6px; height: 6px; border-radius: 50%; pointer-events: none;
@@ -542,11 +830,16 @@
   /* Responsive */
   @media (max-width: 640px) {
     .topbar { padding: 16px 18px; }
-    .hero { padding: 100px 18px 100px; }
+    .hero { padding: 100px 18px 60px; }
     .bio { padding: 80px 18px 100px; }
     .socials { grid-template-columns: 1fr; }
     .lang-switch button { padding: 6px 10px; font-size: 10px; }
     .brand-name { font-size: 14px; }
+    /* Take scroll-cta out of absolute on mobile so it doesn't overlap socials */
+    .scroll-cta {
+      position: relative; bottom: auto; left: auto;
+      transform: none; margin: 36px auto 0;
+    }
   }
 </style>
 </head>
@@ -568,7 +861,7 @@
 
 <!-- TOPBAR -->
 <header class="topbar">
-  <div class="brand">
+  <button class="brand" id="brandBtn" aria-label="К началу">
     <div class="brand-glyph">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
         <path d="M12 2 C9 7 6 9 6 13 C6 17 9 20 12 20 C15 20 18 17 18 13 C18 10 16 8 15 5 C14 8 12 9 11 10 C11 7 12 5 12 2Z" fill="#1a0a0c"/>
@@ -576,14 +869,26 @@
       </svg>
     </div>
     <div class="brand-name">Fox<span>Fire</span></div>
-  </div>
+  </button>
 
-  <nav class="lang-switch" id="langSwitch">
+  <div style="display:flex; gap:10px; align-items:center;">
+    <a class="game-link" href="game.html" aria-label="Игра">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="8" width="18" height="10" rx="5"/>
+        <path d="M8 13h2M9 12v2"/>
+        <circle cx="15" cy="12.5" r="0.8" fill="currentColor"/>
+        <circle cx="17" cy="14" r="0.8" fill="currentColor"/>
+      </svg>
+      <span data-i18n="game_link">Игра</span>
+    </a>
+    <nav class="lang-switch" id="langSwitch">
     <button data-lang="ru" class="active">RU</button>
     <button data-lang="en">EN</button>
     <button data-lang="de">DE</button>
     <button data-lang="fyr">фыр</button>
+    <button data-lang="zh">中</button>
   </nav>
+  </div>
 </header>
 
 <!-- HERO -->
@@ -596,7 +901,7 @@
         <span class="fire-word boop-target">FoxFire</span>
       </h1>
       <p class="hero-sub" data-reveal data-delay="2" data-i18n="hero_sub">
-        Огненный лис из VRChat. Нарезаю стримы PROGDY, снимаю клипы и пародии прямо из виртуальной реальности.
+        Огненный лис из VRChat. Нарезаю стримы <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a>, снимаю клипы и пародии прямо из виртуальной реальности.
       </p>
 
       <div class="socials" data-reveal data-delay="3">
@@ -659,6 +964,41 @@
             <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round"/>
           </svg>
         </a>
+
+        <!-- Twitch -->
+        <a class="social" href="https://www.twitch.tv/foxfire_uwu" target="_blank" rel="noopener"
+           style="--brand-a:#9146ff;--brand-b:#6f25c9;" data-hover>
+          <div class="social-icon" style="color:#b48cff;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.3 0L1 4.3v15h5.7V24h3.2l4.3-4.7h4.6L23 14.3V0H4.3zm15.3 13.4l-3.2 3.3h-5.1L8.6 19.3v-2.6H4.7V1.7h15v11.7zM18.3 4.8h-2.1v6.2h2.1V4.8zm-5.4 0h-2.1v6.2h2.1V4.8z"/></svg>
+          </div>
+          <div class="social-text">
+            <div class="social-name">Twitch</div>
+            <div class="social-handle">foxfire_uwu</div>
+          </div>
+          <svg class="social-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round"/>
+          </svg>
+        </a>
+
+        <!-- DonationAlerts -->
+        <a class="social" href="https://www.donationalerts.com/r/foxfire_uwu" target="_blank" rel="noopener"
+           style="--brand-a:#fe7c00;--brand-b:#d96000;" data-hover>
+          <div class="social-icon" style="color:#fe9a33;">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 3 L17 3 L21 7 L21 17 Q21 19 19 19 L11 19 L4 22 L7 19 Q3 19 3 17 L3 5 Q3 3 5 3 Z" fill="currentColor"/>
+              <rect x="7" y="6" width="10" height="10" rx="1.5" fill="#fff"/>
+              <rect x="11" y="7.5" width="2" height="5" rx="0.5" fill="currentColor"/>
+              <rect x="11" y="13.6" width="2" height="1.9" rx="0.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="social-text">
+            <div class="social-name">DonationAlerts</div>
+            <div class="social-handle">foxfire_uwu</div>
+          </div>
+          <svg class="social-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round"/>
+          </svg>
+        </a>
       </div>
     </div>
 
@@ -667,7 +1007,7 @@
       <div class="portrait-frame-corner tr"></div>
       <div class="portrait-frame-corner bl"></div>
       <div class="portrait-frame-corner br"></div>
-      <img src="assets/foxfire-portrait.png" alt="FoxFire" id="portraitImg"/>
+      <img src="assets/foxfire-portrait.jpg" alt="FoxFire" id="portraitImg"/>
       <div class="portrait-tag">
         <div>
           <div class="portrait-meta" data-i18n="portrait_meta">Огненный лис · фурри</div>
@@ -692,9 +1032,9 @@
 <section class="bio" id="bio">
   <div class="bio-grid">
     <div class="bio-images" data-reveal>
-      <div class="bio-img main"><img src="assets/foxfire-hoodie.png" alt="FoxFire in hoodie"/></div>
-      <div class="bio-img tag"><img src="assets/foxfire-bio-closeup.png" alt="FoxFire closeup"/></div>
-      <div class="bio-img acc"><img src="assets/foxfire-bio-fire.png" alt="FoxFire fire"/></div>
+      <div class="bio-img main"><img src="assets/foxfire-hoodie.jpg" alt="FoxFire in hoodie"/></div>
+      <div class="bio-img tag"><img src="assets/foxfire-bio-closeup.jpg" alt="FoxFire closeup"/></div>
+      <div class="bio-img acc"><img src="assets/foxfire-bio-fire.jpg" alt="FoxFire fire"/></div>
     </div>
 
     <div class="bio-content">
@@ -704,7 +1044,7 @@
         <span data-i18n="bio_title3">с большим сердцем.</span>
       </h2>
       <p class="bio-text" data-reveal data-delay="2">
-        <span data-i18n="bio_p1">Я <strong>FoxFire</strong> — занимаюсь нарезками стримера-фурри <strong>PROGDY</strong>, собираю лучшие моменты и угарные сценки в короткие видео.</span>
+        <span data-i18n="bio_p1">Я <strong>FoxFire</strong> — занимаюсь нарезками стримера-фурри <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a>, собираю лучшие моменты и угарные сценки в короткие видео.</span>
       </p>
       <p class="bio-text" data-reveal data-delay="3">
         <span data-i18n="bio_p2">Параллельно веду свой канал на YouTube, провожу собственные трансляции и снимаю клипы, пародии и просто весёлые видео прямо <strong>в VRChat</strong> — и всё это выкладываю на <strong>YouTube</strong>. Заходи, будет тепло.</span>
@@ -716,22 +1056,22 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4zM3 12l9 4 9-4M3 17l9 4 9-4" stroke-linejoin="round"/></svg>
           </div>
           <div class="bio-stat-label" data-i18n="stat1_l">Контент</div>
-          <div class="bio-stat-value" data-i18n="stat1_v">Нарезки PROGDY</div>
+          <div class="bio-stat-value" data-i18n="stat1_v">Нарезки <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a></div>
         </div>
-        <div class="bio-stat">
+        <a class="bio-stat bio-stat-link" href="https://www.twitch.tv/foxfire_uwu" target="_blank" rel="noopener">
           <div class="bio-stat-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M4.3 0L1 4.3v15h5.7V24h3.2l4.3-4.7h4.6L23 14.3V0H4.3zm15.3 13.4l-3.2 3.3h-5.1L8.6 19.3v-2.6H4.7V1.7h15v11.7zM18.3 4.8h-2.1v6.2h2.1V4.8zm-5.4 0h-2.1v6.2h2.1V4.8z"/></svg>
           </div>
           <div class="bio-stat-label" data-i18n="stat2_l">Стримы</div>
           <div class="bio-stat-value" data-i18n="stat2_v">Иногда в эфире</div>
-        </div>
-        <div class="bio-stat">
+        </a>
+        <a class="bio-stat bio-stat-link" href="https://www.youtube.com/@FoxFire_UwU" target="_blank" rel="noopener">
           <div class="bio-stat-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
           </div>
           <div class="bio-stat-label" data-i18n="stat3_l">Платформа</div>
           <div class="bio-stat-value">YouTube</div>
-        </div>
+        </a>
       </div>
     </div>
   </div>
@@ -744,10 +1084,260 @@
   <div class="foot-hint" data-i18n="foot_hint">Подсказка: тыкни в <span>FoxFire</span> или <span>UwU</span> несколько раз 🔥</div>
 </footer>
 
+<!-- BACK TO TOP -->
+<button class="to-top" id="toTop" aria-label="Наверх">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <path d="M12 19V5M6 11l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
 <!-- UwU easter egg -->
 <div id="uwu" aria-hidden="true">
   <div class="uwu-sub">FoxFire</div>
   <div class="uwu-main">UwU</div>
+</div>
+
+<!-- Social Credit meme overlay -->
+<div id="socred" aria-hidden="true">
+  <div class="sc-flash"></div>
+  <div class="sc-texture"></div>
+
+  <div class="sc-frame">
+    <!-- LEFT: Arrow + +1000 + Social Credit -->
+    <div class="sc-left">
+      <svg class="sc-arrow sc-good" viewBox="0 0 80 120" fill="none">
+        <defs>
+          <linearGradient id="scArrowGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#a8f0bf"/>
+            <stop offset="100%" stop-color="#ffffff"/>
+          </linearGradient>
+        </defs>
+        <path d="M28 118 L28 56 L8 56 L40 4 L72 56 L52 56 L52 118 Z"
+              fill="url(#scArrowGrad)" stroke="#0e3c1c" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M40 12 L66 54 L52 54 L52 80" stroke="rgba(255,255,255,0.65)" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <!-- DOWN ARROW (bad) -->
+      <svg class="sc-arrow sc-bad" viewBox="0 0 80 120" fill="none">
+        <defs>
+          <linearGradient id="scArrowGradBad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffd6d6"/>
+            <stop offset="100%" stop-color="#ffffff"/>
+          </linearGradient>
+        </defs>
+        <path d="M28 2 L28 64 L8 64 L40 116 L72 64 L52 64 L52 2 Z"
+              fill="url(#scArrowGradBad)" stroke="#3d0606" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M40 108 L14 66 L28 66 L28 40" stroke="rgba(255,255,255,0.65)" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="sc-plus sc-good">+1000</div>
+      <div class="sc-plus sc-bad">−1,000,000,000</div>
+      <div class="sc-title">Social Credit</div>
+      <div class="sc-tag sc-good">
+        <span class="sc-tag-dot"></span>
+        Citizen <span style="opacity:0.7;margin:0 4px;">·</span> FoxFire · OK
+      </div>
+      <div class="sc-tag sc-bad">
+        <span class="sc-tag-dot"></span>
+        Citizen <span style="opacity:0.7;margin:0 4px;">·</span> FoxFire · VIOLATION
+      </div>
+    </div>
+
+    <!-- RIGHT: 做得好 + mascot (good) / panic mascot (bad) -->
+    <div class="sc-right">
+      <div class="sc-cn sc-good">做得好</div>
+      <div class="sc-cn sc-bad">罪 !</div>
+      <svg class="sc-mascot sc-good" viewBox="0 0 240 280" fill="none" aria-hidden="true">
+        <defs>
+          <radialGradient id="scFace" cx="45%" cy="38%" r="60%">
+            <stop offset="0%" stop-color="#fff2a8"/>
+            <stop offset="55%" stop-color="#ffd633"/>
+            <stop offset="100%" stop-color="#d99a14"/>
+          </radialGradient>
+          <radialGradient id="scHand" cx="40%" cy="40%" r="60%">
+            <stop offset="0%" stop-color="#fff2a8"/>
+            <stop offset="60%" stop-color="#ffd633"/>
+            <stop offset="100%" stop-color="#d99a14"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Queue (braid) behind everything -->
+        <g stroke="#1a1a1a" stroke-width="7" fill="none" stroke-linecap="round">
+          <path d="M148 78 Q172 80 188 100 Q200 122 196 152 Q190 192 178 226 Q172 244 170 262"/>
+        </g>
+        <!-- braid bumps -->
+        <g fill="#0d0d0d">
+          <circle cx="194" cy="118" r="6"/>
+          <circle cx="198" cy="148" r="6"/>
+          <circle cx="190" cy="180" r="6"/>
+          <circle cx="180" cy="212" r="6"/>
+          <circle cx="172" cy="244" r="6"/>
+        </g>
+        <!-- braid tassel -->
+        <path d="M168 258 L164 274 M170 258 L172 276 M172 258 L180 274" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- Face -->
+        <circle cx="120" cy="140" r="82" fill="url(#scFace)" stroke="#a07a10" stroke-width="2"/>
+
+        <!-- Hat (skullcap) -->
+        <path d="M48 80 Q50 50 78 38 Q98 30 120 30 Q142 30 162 38 Q190 50 192 80 Z"
+              fill="#161616" stroke="#000" stroke-width="1.5"/>
+        <ellipse cx="120" cy="80" rx="72" ry="10" fill="#1f1f1f"/>
+        <!-- gold trim -->
+        <path d="M48 80 L192 80" stroke="#d4a64a" stroke-width="3"/>
+        <!-- top knob (red button) -->
+        <circle cx="120" cy="30" r="10" fill="#dc2626" stroke="#7a0a0a" stroke-width="1.5"/>
+        <circle cx="117" cy="27" r="3" fill="#ff8a8a"/>
+        <!-- chinese 男 -->
+        <text x="120" y="68" text-anchor="middle" font-family="serif" font-size="20" font-weight="700" fill="#dc2626">男</text>
+
+        <!-- Eyes (happy squint) -->
+        <path d="M75 132 Q90 118 105 132" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" fill="none"/>
+        <path d="M138 132 Q153 118 168 132" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" fill="none"/>
+
+        <!-- Cheeks blush -->
+        <ellipse cx="72" cy="160" rx="11" ry="7" fill="#ff7575" opacity="0.55"/>
+        <ellipse cx="170" cy="160" rx="11" ry="7" fill="#ff7575" opacity="0.55"/>
+
+        <!-- Big smile -->
+        <path d="M72 168 Q120 224 168 168 Q160 198 120 205 Q80 198 72 168 Z" fill="#1a1a1a"/>
+        <!-- Teeth -->
+        <rect x="82" y="178" width="76" height="14" rx="2" fill="#fff"/>
+        <g stroke="#1a1a1a" stroke-width="1.5">
+          <line x1="101" y1="178" x2="101" y2="192"/>
+          <line x1="120" y1="178" x2="120" y2="192"/>
+          <line x1="139" y1="178" x2="139" y2="192"/>
+        </g>
+        <!-- Tongue hint -->
+        <path d="M104 192 Q120 204 136 192" fill="#e74c5b"/>
+
+        <!-- Thumbs up hand -->
+        <g transform="translate(-12, 168) rotate(-12)">
+          <!-- Wrist/sleeve -->
+          <rect x="4" y="60" width="42" height="30" rx="6" fill="#1f7a36" stroke="#0e3c1c" stroke-width="1.5"/>
+          <path d="M4 60 L46 60 L42 66 L8 66 Z" fill="#0e3c1c"/>
+          <!-- Fist -->
+          <ellipse cx="32" cy="42" rx="24" ry="22" fill="url(#scHand)" stroke="#a07a10" stroke-width="1.5"/>
+          <!-- Knuckle lines -->
+          <path d="M16 38 Q22 32 28 38 M28 36 Q34 30 40 36 M40 36 Q46 30 50 36" stroke="#a07a10" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <!-- Thumb -->
+          <path d="M30 22 Q26 6 34 0 Q44 -2 46 8 L44 28 Z" fill="url(#scHand)" stroke="#a07a10" stroke-width="1.5"/>
+          <!-- Nail highlight -->
+          <ellipse cx="38" cy="6" rx="3" ry="4" fill="#fff5b8" opacity="0.85"/>
+        </g>
+      </svg>
+
+      <!-- PANIC MASCOT (bad) -->
+      <svg class="sc-mascot sc-bad" viewBox="0 0 240 280" fill="none" aria-hidden="true">
+        <defs>
+          <radialGradient id="scFaceBad" cx="45%" cy="38%" r="60%">
+            <stop offset="0%" stop-color="#fff2a8"/>
+            <stop offset="55%" stop-color="#ffd633"/>
+            <stop offset="100%" stop-color="#d99a14"/>
+          </radialGradient>
+          <radialGradient id="scHandBad" cx="40%" cy="40%" r="60%">
+            <stop offset="0%" stop-color="#fff2a8"/>
+            <stop offset="60%" stop-color="#ffd633"/>
+            <stop offset="100%" stop-color="#d99a14"/>
+          </radialGradient>
+        </defs>
+        <!-- Queue swinging -->
+        <g stroke="#1a1a1a" stroke-width="7" fill="none" stroke-linecap="round">
+          <path d="M148 78 Q178 100 198 132 Q210 168 196 200 Q178 224 158 250 Q150 264 156 274"/>
+        </g>
+        <g fill="#0d0d0d">
+          <circle cx="196" cy="148" r="6"/>
+          <circle cx="206" cy="178" r="6"/>
+          <circle cx="194" cy="210" r="6"/>
+          <circle cx="172" cy="240" r="6"/>
+          <circle cx="156" cy="264" r="6"/>
+        </g>
+        <path d="M152 268 L148 282 M156 268 L160 284 M159 268 L168 282" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- Face -->
+        <circle cx="120" cy="140" r="82" fill="url(#scFaceBad)" stroke="#a07a10" stroke-width="2"/>
+
+        <!-- Hat (same) -->
+        <path d="M48 80 Q50 50 78 38 Q98 30 120 30 Q142 30 162 38 Q190 50 192 80 Z" fill="#161616" stroke="#000" stroke-width="1.5"/>
+        <ellipse cx="120" cy="80" rx="72" ry="10" fill="#1f1f1f"/>
+        <path d="M48 80 L192 80" stroke="#d4a64a" stroke-width="3"/>
+        <circle cx="120" cy="30" r="10" fill="#dc2626" stroke="#7a0a0a" stroke-width="1.5"/>
+        <circle cx="117" cy="27" r="3" fill="#ff8a8a"/>
+        <text x="120" y="68" text-anchor="middle" font-family="serif" font-size="20" font-weight="700" fill="#dc2626">男</text>
+
+        <!-- Raised eyebrows (panicked V shape) -->
+        <path d="M70 100 L94 112 L80 96" stroke="#1a1a1a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M170 100 L146 112 L160 96" stroke="#1a1a1a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- Wide popping eyes -->
+        <ellipse cx="92" cy="130" rx="15" ry="17" fill="#fff" stroke="#1a1a1a" stroke-width="2"/>
+        <ellipse cx="150" cy="130" rx="15" ry="17" fill="#fff" stroke="#1a1a1a" stroke-width="2"/>
+        <!-- Small panicked pupils -->
+        <circle cx="94" cy="134" r="5" fill="#1a1a1a"/>
+        <circle cx="152" cy="134" r="5" fill="#1a1a1a"/>
+        <circle cx="95.5" cy="132.5" r="1.5" fill="#fff"/>
+        <circle cx="153.5" cy="132.5" r="1.5" fill="#fff"/>
+
+        <!-- Cheeks (slightly pale) -->
+        <ellipse cx="72" cy="160" rx="10" ry="6" fill="#ff7575" opacity="0.35"/>
+        <ellipse cx="170" cy="160" rx="10" ry="6" fill="#ff7575" opacity="0.35"/>
+
+        <!-- Wide-open scream mouth -->
+        <ellipse cx="120" cy="180" rx="24" ry="24" fill="#1a1a1a" stroke="#0a0a0a" stroke-width="1.5"/>
+        <ellipse cx="120" cy="184" rx="16" ry="16" fill="#3a0610"/>
+        <!-- Tongue inside -->
+        <path d="M108 188 Q120 204 132 188 Q126 210 120 213 Q114 210 108 188 Z" fill="#e74c5b"/>
+        <!-- Top teeth row -->
+        <rect x="108" y="161" width="24" height="7" fill="#fff" rx="1.5"/>
+        <line x1="114" y1="161" x2="114" y2="168" stroke="#1a1a1a" stroke-width="0.8"/>
+        <line x1="120" y1="161" x2="120" y2="168" stroke="#1a1a1a" stroke-width="0.8"/>
+        <line x1="126" y1="161" x2="126" y2="168" stroke="#1a1a1a" stroke-width="0.8"/>
+
+        <!-- Sweat drops -->
+        <path d="M186 96 Q192 112 184 118 Q176 112 184 96 Z" fill="#7ecbff" stroke="#4a9bd0" stroke-width="1.2"/>
+        <ellipse cx="187" cy="104" rx="1.5" ry="3" fill="#cfecff"/>
+        <path d="M50 124 Q56 140 48 146 Q40 140 48 124 Z" fill="#7ecbff" stroke="#4a9bd0" stroke-width="1.2"/>
+        <ellipse cx="51" cy="132" rx="1.5" ry="3" fill="#cfecff"/>
+
+        <!-- Hands raised in panic -->
+        <g transform="translate(8, 172) rotate(15)">
+          <rect x="6" y="44" width="40" height="28" rx="6" fill="#7a0a0a" stroke="#3d0606" stroke-width="1.5"/>
+          <path d="M6 44 L46 44 L42 50 L10 50 Z" fill="#3d0606"/>
+          <ellipse cx="26" cy="24" rx="22" ry="22" fill="url(#scHandBad)" stroke="#a07a10" stroke-width="1.5"/>
+          <g fill="url(#scHandBad)" stroke="#a07a10" stroke-width="1.5" stroke-linejoin="round">
+            <rect x="4"  y="0"  width="7" height="16" rx="3.5"/>
+            <rect x="13" y="-4" width="7" height="20" rx="3.5"/>
+            <rect x="22" y="-6" width="7" height="22" rx="3.5"/>
+            <rect x="31" y="-2" width="7" height="18" rx="3.5"/>
+          </g>
+          <path d="M8 22 Q10 30 18 28" stroke="#a07a10" stroke-width="1.2" fill="none"/>
+        </g>
+        <g transform="translate(232, 172) scale(-1,1) rotate(15)">
+          <rect x="6" y="44" width="40" height="28" rx="6" fill="#7a0a0a" stroke="#3d0606" stroke-width="1.5"/>
+          <path d="M6 44 L46 44 L42 50 L10 50 Z" fill="#3d0606"/>
+          <ellipse cx="26" cy="24" rx="22" ry="22" fill="url(#scHandBad)" stroke="#a07a10" stroke-width="1.5"/>
+          <g fill="url(#scHandBad)" stroke="#a07a10" stroke-width="1.5" stroke-linejoin="round">
+            <rect x="4"  y="0"  width="7" height="16" rx="3.5"/>
+            <rect x="13" y="-4" width="7" height="20" rx="3.5"/>
+            <rect x="22" y="-6" width="7" height="22" rx="3.5"/>
+            <rect x="31" y="-2" width="7" height="18" rx="3.5"/>
+          </g>
+          <path d="M8 22 Q10 30 18 28" stroke="#a07a10" stroke-width="1.2" fill="none"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Stamp (good = approved, bad = denied) -->
+  <div class="sc-stamp sc-good">
+    <span class="sc-stamp-cn">中华人民认证</span>
+    Approved
+  </div>
+  <div class="sc-stamp sc-bad">
+    <span class="sc-stamp-cn">执行通知 · 明天黎明</span>
+    Execution Notice
+  </div>
+
+  <!-- Confetti container (sparkles injected by JS) -->
+  <div id="scConfetti"></div>
 </div>
 
 <!-- BOOP -->
@@ -761,9 +1351,10 @@
 const STR = {
   ru: {
     loading: 'Разжигаем огонёк…',
+    game_link: 'Игра',
     eyebrow: 'VRChat · YouTube · Стримы',
     hero1: 'Привет, я',
-    hero_sub: 'Огненный лис из VRChat. Нарезаю стримы PROGDY, снимаю клипы и пародии прямо из виртуальной реальности.',
+    hero_sub: 'Огненный лис из VRChat. Нарезаю стримы <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a>, снимаю клипы и пародии прямо из виртуальной реальности.',
     discord_handle: 'сервер UwU',
     portrait_meta: 'Огненный лис · фурри',
     scroll_cta: 'кто такой foxfire',
@@ -771,9 +1362,9 @@ const STR = {
     bio_title1: 'Просто',
     bio_title2: 'огненный лис',
     bio_title3: 'с большим сердцем.',
-    bio_p1: 'Я <strong>FoxFire</strong> — занимаюсь нарезками стримера-фурри <strong>PROGDY</strong>, собираю лучшие моменты и угарные сценки в короткие видео.',
+    bio_p1: 'Я <strong>FoxFire</strong> — занимаюсь нарезками стримера-фурри <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a>, собираю лучшие моменты и угарные сценки в короткие видео.',
     bio_p2: 'Параллельно веду свой канал на YouTube, провожу собственные трансляции и снимаю клипы, пародии и просто весёлые видео прямо <strong>в VRChat</strong> — и всё это выкладываю на <strong>YouTube</strong>. Заходи, будет тепло.',
-    stat1_l: 'Контент',     stat1_v: 'Нарезки PROGDY',
+    stat1_l: 'Контент',     stat1_v: 'Нарезки <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a>',
     stat2_l: 'Стримы',      stat2_v: 'Иногда в эфире',
     stat3_l: 'Платформа',
     foot_made: 'Сделано с <span class="heart">♥</span> и огоньком · FoxFire 2026',
@@ -782,9 +1373,10 @@ const STR = {
   },
   en: {
     loading: 'Lighting the fire…',
+    game_link: 'Game',
     eyebrow: 'VRChat · YouTube · Streams',
     hero1: 'Hey, I\'m',
-    hero_sub: 'A fiery little fox from VRChat. I cut up PROGDY streams and film clips & parodies straight from virtual reality.',
+    hero_sub: 'A fiery little fox from VRChat. I cut up <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a> streams and film clips & parodies straight from virtual reality.',
     discord_handle: 'UwU server',
     portrait_meta: 'Fiery fox · furry',
     scroll_cta: 'who is foxfire',
@@ -792,9 +1384,9 @@ const STR = {
     bio_title1: 'Just a',
     bio_title2: 'fiery little fox',
     bio_title3: 'with a big heart.',
-    bio_p1: 'I\'m <strong>FoxFire</strong> — I make highlight cuts of the furry streamer <strong>PROGDY</strong>, capturing the best moments and funniest scenes in short videos.',
+    bio_p1: 'I\'m <strong>FoxFire</strong> — I make highlight cuts of the furry streamer <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a>, capturing the best moments and funniest scenes in short videos.',
     bio_p2: 'On the side I run my own YouTube channel, stream from time to time, and film clips, parodies and silly videos right inside <strong>VRChat</strong> — and post all of it on <strong>YouTube</strong>. Come hang out, it\'s warm here.',
-    stat1_l: 'Content',     stat1_v: 'PROGDY cuts',
+    stat1_l: 'Content',     stat1_v: '<a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a> cuts',
     stat2_l: 'Streams',     stat2_v: 'Live sometimes',
     stat3_l: 'Platform',
     foot_made: 'Made with <span class="heart">♥</span> and a little fire · FoxFire 2026',
@@ -803,9 +1395,10 @@ const STR = {
   },
   de: {
     loading: 'Wir entfachen das Feuer…',
+    game_link: 'Spiel',
     eyebrow: 'VRChat · YouTube · Streams',
     hero1: 'Hi, ich bin',
-    hero_sub: 'Ein feuriger kleiner Fuchs aus VRChat. Ich schneide PROGDY-Streams und drehe Clips & Parodien direkt aus der virtuellen Realität.',
+    hero_sub: 'Ein feuriger kleiner Fuchs aus VRChat. Ich schneide <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a>-Streams und drehe Clips & Parodien direkt aus der virtuellen Realität.',
     discord_handle: 'UwU-Server',
     portrait_meta: 'Feuriger Fuchs · Furry',
     scroll_cta: 'wer ist foxfire',
@@ -813,9 +1406,9 @@ const STR = {
     bio_title1: 'Einfach ein',
     bio_title2: 'feuriger Fuchs',
     bio_title3: 'mit großem Herz.',
-    bio_p1: 'Ich bin <strong>FoxFire</strong> — ich mache Highlight-Cuts des Furry-Streamers <strong>PROGDY</strong> und packe die besten Momente und lustigsten Szenen in kurze Videos.',
+    bio_p1: 'Ich bin <strong>FoxFire</strong> — ich mache Highlight-Cuts des Furry-Streamers <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a> und packe die besten Momente und lustigsten Szenen in kurze Videos.',
     bio_p2: 'Nebenbei betreibe ich meinen eigenen YouTube-Kanal, streame ab und zu und drehe Clips, Parodien und alberne Videos direkt in <strong>VRChat</strong> — und lade alles auf <strong>YouTube</strong> hoch. Komm vorbei, hier ist es warm.',
-    stat1_l: 'Inhalt',      stat1_v: 'PROGDY-Cuts',
+    stat1_l: 'Inhalt',      stat1_v: '<a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a>-Cuts',
     stat2_l: 'Streams',     stat2_v: 'Manchmal live',
     stat3_l: 'Plattform',
     foot_made: 'Gemacht mit <span class="heart">♥</span> und ein bisschen Feuer · FoxFire 2026',
@@ -824,6 +1417,7 @@ const STR = {
   },
   fyr: {
     loading: 'Фыр фыр фыр…',
+    game_link: 'фыр!',
     eyebrow: 'Фыр · Фыр · Фыр',
     hero1: 'Фыр фыр',
     hero_sub: 'Фыр фыр фыр фыр-фыр, фыр фыр-фыр фыр фыр-фыр фыр фыр фыр-фыр. Фыр!',
@@ -834,14 +1428,36 @@ const STR = {
     bio_title1: 'Просто',
     bio_title2: 'фыр-фыр',
     bio_title3: 'с большим фыр.',
-    bio_p1: 'Я <strong>FoxFire</strong> — фыр фыр-фыр <strong>PROGDY</strong>, фыр фыр-фыр фыр фыр-фыр фыр.',
+    bio_p1: 'Я <strong>FoxFire</strong> — фыр фыр-фыр <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a>, фыр фыр-фыр фыр фыр-фыр фыр.',
     bio_p2: 'Фыр фыр-фыр YouTube, фыр-фыр фыр фыр фыр-фыр фыр-фыр <strong>в VRChat</strong> — фыр фыр на <strong>YouTube</strong>. Фыр фыр, фыр фыр!',
-    stat1_l: 'Фыр',         stat1_v: 'Фыр PROGDY',
+    stat1_l: 'Фыр',         stat1_v: 'Фыр <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a>',
     stat2_l: 'Фыр',         stat2_v: 'Иногда фыр',
     stat3_l: 'Фыр',
     foot_made: 'Фыр-фыр с <span class="heart">♥</span> и фыр · FoxFire 2026',
     foot_hint: 'Фыр: <span>фыр</span> в FoxFire или UwU несколько раз 🔥',
     boop_sub: 'фыр'
+  },
+  zh: {
+    loading: '点燃火焰…',
+    game_link: '游戏',
+    eyebrow: 'VRChat · YouTube · 直播',
+    hero1: '你好，我是',
+    hero_sub: '来自 VRChat 的火狐。我剪辑 <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a> 的直播片段，在虚拟现实中拍摄短片与搞笑视频。',
+    discord_handle: 'UwU 服务器',
+    portrait_meta: '火狐 · 毛茸',
+    scroll_cta: 'FoxFire 是谁',
+    bio_eyebrow: '关于我',
+    bio_title1: '只是一只',
+    bio_title2: '火狐',
+    bio_title3: '有着大大的心。',
+    bio_p1: '我是 <strong>FoxFire</strong> — 我为毛茸主播 <a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a> 制作精选剪辑，把最精彩、最搞笑的片段汇集成短视频。',
+    bio_p2: '同时我运营着自己的 YouTube 频道，偊尔开直播，在 <strong>VRChat</strong> 里拍摄短片、恶搞与趣味视频 — 全部发布在 <strong>YouTube</strong> 上。过来玩玩吧，这里很温暖。',
+    stat1_l: '内容',     stat1_v: '<a class="progdy-link" href="https://progdy.ru/" target="_blank" rel="noopener">PROGDY</a> 剪辑',
+    stat2_l: '直播',     stat2_v: '偊尔开播',
+    stat3_l: '平台',
+    foot_made: '用 <span class="heart">♥</span> 与火花制作 · FoxFire 2026',
+    foot_hint: '提示：试试连点 <span>FoxFire</span> 或 <span>UwU</span> 几下 🔥',
+    boop_sub: 'FoxFire'
   }
 };
 
@@ -861,14 +1477,196 @@ function applyLang(lang) {
 }
 
 document.querySelectorAll('#langSwitch button').forEach(b => {
-  b.addEventListener('click', () => applyLang(b.dataset.lang));
+  b.addEventListener('click', () => {
+    const prev = localStorage.getItem('foxfire-lang') || 'ru';
+    const next = b.dataset.lang;
+    if (prev === next) { applyLang(next); return; }
+    applyLang(next);
+    if (next === 'zh') triggerSocialCredit('good');
+    else if (prev === 'zh') triggerSocialCredit('bad');
+  });
 });
 applyLang(localStorage.getItem('foxfire-lang') || 'ru');
+
+/* ====================== Social Credit meme ====================== */
+const socredEl = document.getElementById('socred');
+const scConfettiBox = document.getElementById('scConfetti');
+let socredActive = false;
+
+function makeStarSVG(size, color) {
+  return `<svg viewBox="0 0 24 24" fill="${color}" width="${size}" height="${size}"><path d="M12 1.5l2.95 6.78 7.37.64-5.58 4.86 1.69 7.22L12 17.27l-6.43 3.73 1.69-7.22L1.68 8.92l7.37-.64L12 1.5z"/></svg>`;
+}
+function makeDotSVG(size, color) {
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}"><circle cx="12" cy="12" r="10" fill="${color}"/></svg>`;
+}
+function makeRectSVG(size, color) {
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}"><rect x="4" y="4" width="16" height="16" fill="${color}" transform="rotate(15 12 12)"/></svg>`;
+}
+
+function triggerSocialCredit(variant) {
+  if (socredActive) return;
+  socredActive = true;
+  const isBad = variant === 'bad';
+
+  // toggle variant class BEFORE adding .show so initial states are correct
+  socredEl.classList.toggle('is-bad', isBad);
+
+  // lock scroll while overlay is up
+  const scrollY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.dataset.lockY = String(scrollY);
+  scConfettiBox.innerHTML = '';
+
+  // Confetti — palette depends on variant
+  const palette = isBad
+    ? ['#ffd633', '#ffffff', '#ff6b6b', '#5e0a0a', '#ffffff']
+    : ['#ffd633', '#ffffff', '#a8f0bf', '#ffd633', '#ffffff'];
+  const N = 46;
+  const confetti = [];
+  for (let i = 0; i < N; i++) {
+    const c = document.createElement('div');
+    c.className = 'sc-confetti';
+    const size = 12 + Math.random() * 24;
+    const color = palette[Math.floor(Math.random() * palette.length)];
+    const shape = Math.random();
+    c.innerHTML = shape < 0.55 ? makeStarSVG(size, color)
+                 : shape < 0.8  ? makeDotSVG(size * 0.6, color)
+                 :                makeRectSVG(size * 0.8, color);
+    c.style.width = size + 'px';
+    c.style.height = size + 'px';
+    const startX = Math.random() * 100;
+    const drift = (Math.random() - 0.5) * 26;
+    const startY = -8 - Math.random() * 22;
+    const endY = 108 + Math.random() * 16;
+    const rot = (Math.random() - 0.5) * 60;
+    const endRot = rot + 180 + Math.random() * 360;
+    const dur = 2.6 + Math.random() * 1.4;
+    const delay = 0.5 + Math.random() * 1.4;
+    c.style.left = startX + 'vw';
+    c.style.top = startY + 'vh';
+    c.style.transform = `rotate(${rot}deg)`;
+    c.style.transition = `top ${dur}s linear ${delay}s, left ${dur}s linear ${delay}s, transform ${dur}s linear ${delay}s, opacity 0.4s ease ${delay}s`;
+    scConfettiBox.appendChild(c);
+    confetti.push({ el: c, endX: startX + drift, endY, endRot });
+  }
+
+  socredEl.classList.add('show');
+  requestAnimationFrame(() => {
+    confetti.forEach(c => {
+      c.el.style.opacity = '1';
+      c.el.style.top = c.endY + 'vh';
+      c.el.style.left = c.endX + 'vw';
+      c.el.style.transform = `rotate(${c.endRot}deg)`;
+    });
+  });
+
+  // Audio — happy chord for good, dissonant minor for bad
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) {
+      const ac = new AC();
+      const now = ac.currentTime;
+      const sweepFreqs = isBad ? [400, 280, 180] : [200, 320, 440];
+      sweepFreqs.forEach((f, i) => {
+        const t = i * 0.07;
+        const o = ac.createOscillator();
+        const g = ac.createGain();
+        o.type = isBad ? 'sawtooth' : 'triangle';
+        o.frequency.setValueAtTime(f, now + t);
+        g.gain.setValueAtTime(0.001, now + t);
+        g.gain.exponentialRampToValueAtTime(isBad ? 0.10 : 0.14, now + t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, now + t + 0.3);
+        o.connect(g).connect(ac.destination);
+        o.start(now + t); o.stop(now + t + 0.35);
+      });
+      // Chord — major for good, diminished/minor for bad
+      const chord = isBad ? [220, 261.63, 311.13] : [659.25, 783.99, 987.77];
+      chord.forEach(f => {
+        const o = ac.createOscillator();
+        const g = ac.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(f, now + 0.5);
+        g.gain.setValueAtTime(0.001, now + 0.5);
+        g.gain.exponentialRampToValueAtTime(isBad ? 0.12 : 0.16, now + 0.55);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
+        o.connect(g).connect(ac.destination);
+        o.start(now + 0.5); o.stop(now + 1.5);
+      });
+      // Stamp thud + ding
+      const thud = ac.createOscillator();
+      const tg = ac.createGain();
+      thud.type = 'sine'; thud.frequency.setValueAtTime(120, now + 1.4);
+      thud.frequency.exponentialRampToValueAtTime(40, now + 1.55);
+      tg.gain.setValueAtTime(0.001, now + 1.4);
+      tg.gain.exponentialRampToValueAtTime(isBad ? 0.32 : 0.25, now + 1.42);
+      tg.gain.exponentialRampToValueAtTime(0.001, now + 1.7);
+      thud.connect(tg).connect(ac.destination);
+      thud.start(now + 1.4); thud.stop(now + 1.7);
+
+      const ding = ac.createOscillator();
+      const dg = ac.createGain();
+      ding.type = 'sine'; ding.frequency.setValueAtTime(isBad ? 220 : 1760, now + 1.45);
+      dg.gain.setValueAtTime(0.001, now + 1.45);
+      dg.gain.exponentialRampToValueAtTime(0.14, now + 1.47);
+      dg.gain.exponentialRampToValueAtTime(0.001, now + 2.1);
+      ding.connect(dg).connect(ac.destination);
+      ding.start(now + 1.45); ding.stop(now + 2.2);
+    }
+  } catch (e) {}
+
+  // Gentle satisfying punch when the stamp lands — shake only the frame so the fixed overlay background stays put
+  setTimeout(() => {
+    const frame = socredEl.querySelector('.sc-frame');
+    const stamp = socredEl.querySelector('.sc-stamp');
+    if (!frame) return;
+    let shakes = 0;
+    const iv = setInterval(() => {
+      const x = (Math.random() - 0.5) * 6;
+      const y = (Math.random() - 0.5) * 6;
+      frame.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+      if (stamp) stamp.style.marginTop = ((Math.random() - 0.5) * 4) + 'px';
+      if (++shakes > 5) {
+        clearInterval(iv);
+        frame.style.transform = '';
+        if (stamp) stamp.style.marginTop = '';
+      }
+    }, 60);
+  }, 1400);
+
+  setTimeout(() => {
+    socredEl.classList.remove('show');
+    confetti.forEach(c => c.el.remove());
+    scConfettiBox.innerHTML = '';
+    socredActive = false;
+    const y = parseInt(document.body.dataset.lockY || '0', 10);
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    delete document.body.dataset.lockY;
+    window.scrollTo(0, y);
+  }, 3900);
+}
 
 /* ====================== Loader ====================== */
 window.addEventListener('load', () => {
   setTimeout(() => document.getElementById('loader').classList.add('hidden'), 1500);
 });
+
+/* ====================== Back-to-top ====================== */
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+const toTopBtn = document.getElementById('toTop');
+const brandBtn = document.getElementById('brandBtn');
+brandBtn.addEventListener('click', scrollToTop);
+toTopBtn.addEventListener('click', scrollToTop);
+window.addEventListener('scroll', () => {
+  toTopBtn.classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
 
 /* ====================== Embers ====================== */
 (function makeEmbers() {
@@ -989,7 +1787,9 @@ function triggerUwu() {
 document.querySelectorAll('.uwu-trigger').forEach(el => {
   el.style.cursor = 'pointer';
   el.style.userSelect = 'none';
+  el.addEventListener('mousedown', e => e.preventDefault());
   el.addEventListener('click', () => {
+    if (window.getSelection) window.getSelection().removeAllRanges();
     uwuClicks++;
     el.animate(
       [{ transform: 'scale(1)' }, { transform: 'scale(1.25) rotate(6deg)' }, { transform: 'scale(1)' }],
@@ -1057,7 +1857,9 @@ function triggerBoop() {
 document.querySelectorAll('.boop-target').forEach(el => {
   el.style.cursor = 'pointer';
   el.style.userSelect = 'none';
+  el.addEventListener('mousedown', e => e.preventDefault());
   el.addEventListener('click', () => {
+    if (window.getSelection) window.getSelection().removeAllRanges();
     boopClicks++;
     el.animate(
       [{ transform: 'scale(1)' }, { transform: 'scale(1.12) rotate(-2deg)' }, { transform: 'scale(1)' }],
