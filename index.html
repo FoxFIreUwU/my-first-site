@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FoxFire — UwU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-0: #0a0608;
+    --bg-1: #140a0c;
+    --bg-2: #1d1014;
+    --ink: #fff4e8;
+    --ink-soft: #d8c4b2;
+    --ink-mute: #8a7468;
+    --fire-1: #ff9a3c;   /* warm orange */
+    --fire-2: #ff5e1f;   /* fire orange */
+    --fire-3: #ff2d55;   /* hot edge */
+    --fire-4: #ffd28a;   /* glow */
+    --fire-glow: 0 0 60px rgba(255,94,31,0.45), 0 0 140px rgba(255,45,85,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg-0); color: var(--ink); font-family: 'Manrope', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { overflow-x: hidden; scroll-behavior: smooth; }
+  ::selection { background: var(--fire-2); color: #fff; }
+
+  /* ───────── Background ambient ───────── */
+  .bg-ambient {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(900px 700px at 78% 18%, rgba(255,94,31,0.22), transparent 60%),
+      radial-gradient(800px 700px at 12% 82%, rgba(255,45,85,0.16), transparent 60%),
+      radial-gradient(1100px 800px at 50% 110%, rgba(255,154,60,0.10), transparent 60%),
+      linear-gradient(180deg, #0a0608 0%, #120709 45%, #0a0608 100%);
+  }
+  .grain {
+    position: fixed; inset: -50%; z-index: 1; pointer-events: none; opacity: 0.06;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.85'/></svg>");
+    animation: grain 8s steps(6) infinite;
+  }
+  @keyframes grain {
+    0%   { transform: translate(0,0); }
+    20%  { transform: translate(-3%,2%); }
+    40%  { transform: translate(2%,-4%); }
+    60%  { transform: translate(-2%,3%); }
+    80%  { transform: translate(3%,-2%); }
+    100% { transform: translate(0,0); }
+  }
+
+  /* Embers */
+  .embers { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+  .ember {
+    position: absolute; bottom: -20px; width: 6px; height: 6px; border-radius: 50%;
+    background: radial-gradient(circle, var(--fire-4) 0%, var(--fire-2) 45%, transparent 70%);
+    filter: blur(0.5px);
+    opacity: 0;
+    animation: rise linear infinite;
+  }
+  @keyframes rise {
+    0%   { transform: translateY(0) translateX(0) scale(1);   opacity: 0; }
+    8%   { opacity: 0.9; }
+    100% { transform: translateY(-110vh) translateX(var(--drift, 30px)) scale(0.4); opacity: 0; }
+  }
+
+  /* ───────── Loading screen ───────── */
+  #loader {
+    position: fixed; inset: 0; z-index: 1000;
+    background: radial-gradient(ellipse at center, #1a0a0c 0%, #08050a 70%);
+    display: grid; place-items: center;
+    transition: opacity 0.9s ease, visibility 0.9s ease;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-inner { text-align: center; position: relative; }
+  .loader-word {
+    font-family: 'Unbounded', sans-serif; font-weight: 900;
+    font-size: clamp(48px, 7vw, 86px); letter-spacing: -0.02em;
+    line-height: 1; margin-bottom: 38px;
+    background: linear-gradient(180deg, #ffe6c0 0%, #ff9a3c 45%, #ff5e1f 75%, #ff2d55 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 30px rgba(255,94,31,0.5));
+    animation: loaderBreathe 2.4s ease-in-out infinite;
+  }
+  @keyframes loaderBreathe {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(255,94,31,0.35)); opacity: 0.92; }
+    50%      { filter: drop-shadow(0 0 50px rgba(255,94,31,0.7));  opacity: 1; }
+  }
+  .loader-bar {
+    width: 240px; height: 2px; background: rgba(255,255,255,0.07);
+    border-radius: 2px; overflow: hidden; margin: 0 auto 18px;
+    position: relative;
+  }
+  .loader-bar > span {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, var(--fire-4), var(--fire-2), var(--fire-3), transparent);
+    width: 100%; transform: translateX(-100%);
+    animation: loaderSweep 1.4s cubic-bezier(.4,0,.6,1) infinite;
+  }
+  @keyframes loaderSweep {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .loader-text {
+    font-family: 'Unbounded', sans-serif; font-weight: 600; letter-spacing: 0.5em;
+    font-size: 10px; text-transform: uppercase; color: var(--ink-mute);
+    padding-left: 0.5em;
+  }
+
+  /* ───────── Top bar ───────── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 36px;
+    pointer-events: none;
+  }
+  .topbar > * { pointer-events: auto; }
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'Unbounded', sans-serif; font-weight: 800; letter-spacing: 0.02em;
+  }
+  .brand-glyph {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(140deg, var(--fire-1), var(--fire-3));
+    display: grid; place-items: center; color: #1a0a0c; font-weight: 900;
+    box-shadow: 0 6px 24px rgba(255,94,31,0.35);
+  }
+  .brand-name { font-size: 16px; }
+  .brand-name span { color: var(--fire-1); }
+
+  .lang-switch {
+    display: flex; gap: 4px; padding: 5px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,154,60,0.18);
+    border-radius: 999px; backdrop-filter: blur(14px);
+  }
+  .lang-switch button {
+    border: 0; background: transparent; color: var(--ink-soft);
+    padding: 7px 14px; border-radius: 999px;
+    font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .lang-switch button:hover { color: var(--ink); }
+  .lang-switch button.active {
+    background: linear-gradient(135deg, var(--fire-2), var(--fire-3));
+    color: #fff; box-shadow: 0 4px 16px rgba(255,94,31,0.4);
+  }
+
+  /* ───────── HERO ───────── */
+  .hero {
+    position: relative; z-index: 3;
+    min-height: 100vh; padding: 120px 36px 80px;
+    display: grid; place-items: center;
+    overflow: hidden;
+  }
+  .hero-grid {
+    width: 100%; max-width: 1320px; display: grid;
+    grid-template-columns: 1.05fr 0.95fr; gap: 60px; align-items: center;
+  }
+  @media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .hero-portrait { order: -1; max-width: 380px; margin: 0 auto; }
+  }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.35em; text-transform: uppercase; color: var(--fire-1);
+    padding: 8px 14px; border: 1px solid rgba(255,154,60,0.35); border-radius: 999px;
+    background: rgba(255,94,31,0.06);
+  }
+  .eyebrow::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--fire-2); box-shadow: 0 0 10px var(--fire-2);
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .hero-title {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900; font-size: clamp(64px, 11vw, 156px);
+    line-height: 0.88; letter-spacing: -0.04em;
+    margin: 22px 0 18px;
+    text-wrap: balance;
+  }
+  .hero-title .fire-word {
+    background: linear-gradient(180deg, var(--fire-4) 0%, var(--fire-1) 35%, var(--fire-2) 70%, var(--fire-3) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    background-size: 100% 200%;
+    animation: flameShift 4s ease-in-out infinite alternate;
+    display: inline-block;
+  }
+  @keyframes flameShift {
+    from { background-position: 0% 0%; filter: drop-shadow(0 0 30px rgba(255,94,31,0.35)); }
+    to   { background-position: 0% 80%; filter: drop-shadow(0 0 50px rgba(255,45,85,0.45)); }
+  }
+
+  .hero-sub {
+    font-size: clamp(15px, 1.5vw, 18px); color: var(--ink-soft);
+    max-width: 540px; line-height: 1.6; margin-bottom: 36px;
+  }
+
+  /* Social grid */
+  .socials {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px; max-width: 560px;
+  }
+  .social {
+    position: relative;
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 22px; border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+    border: 1px solid rgba(255,154,60,0.16);
+    color: var(--ink); text-decoration: none;
+    overflow: hidden; isolation: isolate;
+    transition: transform 0.45s cubic-bezier(.2,.8,.2,1), border-color 0.3s ease;
+  }
+  .social::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(135deg, var(--brand-a, var(--fire-2)), var(--brand-b, var(--fire-3)));
+    opacity: 0; transform: translateY(40%);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .social::after {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(400px 200px at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.18), transparent 60%);
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .social:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.25); }
+  .social:hover::before { opacity: 1; transform: translateY(0); }
+  .social:hover::after { opacity: 1; }
+  .social:hover .social-arrow { transform: translate(4px,-4px) rotate(0deg); opacity: 1; }
+  .social:hover .social-icon { transform: scale(1.08) rotate(-4deg); }
+
+  .social-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    display: grid; place-items: center; border-radius: 12px;
+    background: rgba(0,0,0,0.35);
+    transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+  }
+  .social-icon svg { width: 22px; height: 22px; }
+  .social-text { flex: 1; min-width: 0; }
+  .social-name {
+    font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 15px;
+    letter-spacing: 0.02em; margin-bottom: 2px;
+  }
+  .social-handle { font-size: 12px; color: var(--ink-mute); letter-spacing: 0.02em; }
+  .social:hover .social-handle { color: rgba(255,255,255,0.85); }
+  .social-arrow {
+    width: 22px; height: 22px; opacity: 0.4;
+    transform: rotate(-25deg); transition: all 0.4s ease;
+  }
+
+  /* Portrait card */
+  .hero-portrait {
+    position: relative; aspect-ratio: 4/5; max-width: 520px; justify-self: end;
+    border-radius: 32px; overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 80px rgba(255,94,31,0.18);
+    transform: perspective(1200px) rotateY(-6deg) rotateX(2deg);
+    animation: floatPortrait 6s ease-in-out infinite;
+  }
+  @keyframes floatPortrait {
+    0%, 100% { transform: perspective(1200px) rotateY(-6deg) rotateX(2deg) translateY(0); }
+    50%      { transform: perspective(1200px) rotateY(-4deg) rotateX(1deg) translateY(-10px); }
+  }
+  .hero-portrait img {
+    width: 100%; height: 100%; object-fit: cover; object-position: center 18%;
+    display: block;
+  }
+  .hero-portrait::after {
+    content: ''; position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, transparent 50%, rgba(10,6,8,0.85) 100%),
+      linear-gradient(135deg, rgba(255,94,31,0.15), transparent 50%);
+    pointer-events: none;
+  }
+  .portrait-tag {
+    position: absolute; bottom: 22px; left: 22px; right: 22px;
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
+    color: #fff; z-index: 2;
+  }
+  .portrait-name {
+    font-family: 'Unbounded', sans-serif; font-weight: 900;
+    font-size: 28px; letter-spacing: 0.02em;
+  }
+  .portrait-meta { font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--fire-1); }
+  .portrait-frame-corner {
+    position: absolute; width: 28px; height: 28px;
+    border: 2px solid var(--fire-1); z-index: 2;
+  }
+  .portrait-frame-corner.tl { top: 14px; left: 14px; border-right: 0; border-bottom: 0; }
+  .portrait-frame-corner.tr { top: 14px; right: 14px; border-left: 0; border-bottom: 0; }
+  .portrait-frame-corner.bl { bottom: 14px; left: 14px; border-right: 0; border-top: 0; }
+  .portrait-frame-corner.br { bottom: 14px; right: 14px; border-left: 0; border-top: 0; }
+
+  /* Scroll button */
+  .scroll-cta {
+    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    cursor: pointer; background: transparent; border: 0; color: var(--ink-soft);
+    font-family: 'Unbounded', sans-serif; font-size: 11px; letter-spacing: 0.35em;
+    text-transform: uppercase; padding: 8px;
+  }
+  .scroll-cta:hover { color: var(--fire-1); }
+  .scroll-ring {
+    width: 56px; height: 56px; border-radius: 50%; position: relative;
+    border: 1.5px solid rgba(255,154,60,0.4);
+    display: grid; place-items: center;
+    transition: all 0.3s ease;
+  }
+  .scroll-ring::before {
+    content: ''; position: absolute; inset: -6px; border-radius: 50%;
+    border: 1px solid rgba(255,94,31,0.3); animation: ringPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%   { transform: scale(0.85); opacity: 1; }
+    100% { transform: scale(1.3);  opacity: 0; }
+  }
+  .scroll-ring svg { animation: bob 1.8s ease-in-out infinite; }
+  @keyframes bob {
+    0%, 100% { transform: translateY(-3px); }
+    50%      { transform: translateY(3px); }
+  }
+  .scroll-cta:hover .scroll-ring { border-color: var(--fire-1); box-shadow: 0 0 24px rgba(255,94,31,0.4); }
+
+  /* ───────── BIO section ───────── */
+  .bio {
+    position: relative; z-index: 3;
+    padding: 140px 36px 160px;
+    display: grid; place-items: center;
+  }
+  .bio-grid {
+    width: 100%; max-width: 1280px;
+    display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 80px; align-items: center;
+  }
+  @media (max-width: 980px) {
+    .bio-grid { grid-template-columns: 1fr; gap: 40px; }
+  }
+  .bio-images {
+    position: relative; aspect-ratio: 1/1;
+  }
+  .bio-img {
+    position: absolute; border-radius: 24px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+    transition: transform 0.5s ease;
+  }
+  .bio-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bio-img.tag img { object-position: 50% 28%; }
+  .bio-img.acc img { object-position: 50% 38%; }
+  .bio-img.main {
+    inset: 0; transform: rotate(-3deg);
+    border: 2px solid rgba(255,154,60,0.2);
+  }
+  .bio-img.acc {
+    width: 52%; height: 52%; right: -6%; bottom: -6%;
+    transform: rotate(5deg);
+    border: 2px solid rgba(255,94,31,0.35);
+    box-shadow: 0 20px 60px rgba(255,94,31,0.25);
+  }
+  .bio-img.tag {
+    width: 36%; height: 36%; left: -6%; top: -4%;
+    transform: rotate(-8deg);
+    border-radius: 18px;
+    border: 2px solid rgba(255,210,138,0.3);
+  }
+  .bio-images:hover .bio-img.main { transform: rotate(-2deg) translateY(-4px); }
+  .bio-images:hover .bio-img.acc  { transform: rotate(7deg) translate(4px,-4px); }
+  .bio-images:hover .bio-img.tag  { transform: rotate(-10deg) translate(-4px,4px); }
+
+  .bio-content .eyebrow { margin-bottom: 24px; }
+  .bio-title {
+    font-family: 'Unbounded', sans-serif; font-weight: 800;
+    font-size: clamp(36px, 5.4vw, 64px); line-height: 1; letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+  .bio-title em { font-style: normal; color: var(--fire-1); }
+  .bio-text {
+    font-size: 17px; line-height: 1.7; color: var(--ink-soft);
+    max-width: 580px; margin-bottom: 22px;
+    text-wrap: pretty;
+  }
+  .bio-text strong { color: var(--fire-1); font-weight: 600; }
+  .bio-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    margin-top: 40px; max-width: 580px;
+  }
+  .bio-stat {
+    padding: 18px 16px; border-radius: 14px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,154,60,0.15);
+    transition: all 0.3s ease;
+  }
+  .bio-stat:hover { border-color: rgba(255,94,31,0.45); background: rgba(255,94,31,0.05); transform: translateY(-2px); }
+  .bio-stat-icon {
+    width: 28px; height: 28px; display: grid; place-items: center;
+    color: var(--fire-1); margin-bottom: 10px;
+  }
+  .bio-stat-label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 4px; }
+  .bio-stat-value { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 15px; }
+
+  /* ───────── Footer ───────── */
+  .foot {
+    position: relative; z-index: 3;
+    padding: 40px 36px 60px;
+    display: flex; flex-direction: column; align-items: center; gap: 18px;
+    text-align: center;
+  }
+  .foot-divider {
+    width: 100%; max-width: 800px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,154,60,0.4), transparent);
+    margin-bottom: 12px;
+  }
+  .foot-text { font-size: 12px; color: var(--ink-mute); letter-spacing: 0.15em; text-transform: uppercase; }
+  .foot-text .heart { color: var(--fire-2); display: inline-block; animation: hb 1.4s ease-in-out infinite; }
+  @keyframes hb { 0%,100%{transform:scale(1);} 50%{transform:scale(1.25);} }
+  .foot-hint {
+    font-size: 11px; color: var(--ink-mute); opacity: 0.6;
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .foot-hint span { color: var(--fire-1); }
+
+  /* ───────── UwU easter egg ───────── */
+  #uwu {
+    position: fixed; inset: 0; z-index: 998;
+    display: grid; place-items: center;
+    pointer-events: none; opacity: 0;
+    background: radial-gradient(ellipse at center, rgba(255,154,60,0.35), rgba(20,8,12,0.92) 65%);
+    overflow: hidden;
+  }
+  #uwu.show { opacity: 1; pointer-events: auto; animation: uwuBg 3s ease-out forwards; }
+  @keyframes uwuBg {
+    0%   { backdrop-filter: blur(0); }
+    15%  { backdrop-filter: blur(18px); }
+    85%  { backdrop-filter: blur(8px); opacity: 1; }
+    100% { backdrop-filter: blur(0); opacity: 0; }
+  }
+  .uwu-main {
+    font-family: 'Unbounded', sans-serif; font-weight: 900;
+    font-size: clamp(120px, 26vw, 380px); letter-spacing: -0.04em;
+    background: linear-gradient(180deg, #ffe6c0, #ff9a3c 45%, #ff5e1f 75%, #ff2d55);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 60px rgba(255,94,31,0.6));
+    transform: scale(0);
+    position: relative; z-index: 2;
+  }
+  #uwu.show .uwu-main {
+    animation: uwuPop 2.8s cubic-bezier(.16,1.4,.3,1) forwards;
+  }
+  @keyframes uwuPop {
+    0%   { transform: scale(0) rotate(-30deg); }
+    20%  { transform: scale(1.25) rotate(6deg); }
+    35%  { transform: scale(1) rotate(-3deg); }
+    50%  { transform: scale(1.08) rotate(2deg); }
+    80%  { transform: scale(1) rotate(0); opacity: 1; }
+    100% { transform: scale(1.6) rotate(0); opacity: 0; }
+  }
+  .uwu-sub {
+    position: absolute; bottom: 28%; z-index: 2;
+    font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 13px;
+    letter-spacing: 0.6em; color: var(--fire-4); text-transform: uppercase;
+    opacity: 0;
+  }
+  #uwu.show .uwu-sub { animation: uwuSub 2.8s ease-out forwards; }
+  @keyframes uwuSub {
+    0%, 20% { opacity: 0; transform: translateY(20px); }
+    50%     { opacity: 1; transform: translateY(0); }
+    100%    { opacity: 0; transform: translateY(-20px); }
+  }
+  .uwu-rain {
+    position: absolute; font-family: 'Unbounded', sans-serif; font-weight: 800;
+    background: linear-gradient(180deg, #ffd28a, #ff5e1f);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 18px rgba(255,94,31,0.5));
+    pointer-events: none; user-select: none;
+    opacity: 0;
+  }
+  #boop {
+    position: fixed; inset: 0; z-index: 999;
+    display: grid; place-items: center;
+    pointer-events: none; opacity: 0;
+    background: radial-gradient(ellipse at center, rgba(255,94,31,0.4), rgba(10,6,8,0.85) 60%);
+    transition: opacity 0.3s ease;
+  }
+  #boop.show { opacity: 1; pointer-events: auto; animation: boopBg 1.6s ease-out forwards; }
+  @keyframes boopBg {
+    0%   { backdrop-filter: blur(0); }
+    20%  { backdrop-filter: blur(20px); }
+    100% { backdrop-filter: blur(0); opacity: 0; }
+  }
+  .boop-text {
+    font-family: 'Unbounded', sans-serif; font-weight: 900;
+    font-size: clamp(96px, 22vw, 320px); letter-spacing: -0.02em;
+    background: linear-gradient(180deg, var(--fire-4), var(--fire-2) 50%, var(--fire-3));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 80px rgba(255,94,31,0.6);
+    transform: scale(0);
+    filter: drop-shadow(0 0 40px rgba(255,94,31,0.6));
+  }
+  #boop.show .boop-text { animation: boopPop 1.6s cubic-bezier(.16,1.6,.3,1) forwards; }
+  @keyframes boopPop {
+    0%   { transform: scale(0) rotate(-20deg); }
+    25%  { transform: scale(1.3) rotate(8deg); }
+    50%  { transform: scale(1) rotate(-3deg); }
+    75%  { transform: scale(1.05) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1.4) rotate(0deg); opacity: 0; }
+  }
+  .boop-sub {
+    position: absolute; bottom: 38%; font-family: 'Unbounded', sans-serif;
+    font-weight: 700; font-size: 14px; letter-spacing: 0.6em; color: var(--fire-4);
+    opacity: 0; text-transform: uppercase;
+  }
+  #boop.show .boop-sub { animation: boopSub 1.6s ease-out forwards; }
+  @keyframes boopSub {
+    0%, 30% { opacity: 0; transform: translateY(20px); }
+    50%     { opacity: 1; transform: translateY(0); }
+    100%    { opacity: 0; transform: translateY(-20px); }
+  }
+  .boop-particle {
+    position: absolute; width: 14px; height: 14px; border-radius: 50%;
+    background: radial-gradient(circle, var(--fire-4) 0%, var(--fire-2) 60%, transparent 100%);
+  }
+
+  /* Reveal animations */
+  [data-reveal] { opacity: 0; transform: translateY(40px); transition: opacity 0.9s ease, transform 0.9s cubic-bezier(.2,.8,.2,1); }
+  [data-reveal].in { opacity: 1; transform: none; }
+  [data-reveal][data-delay="1"] { transition-delay: 0.1s; }
+  [data-reveal][data-delay="2"] { transition-delay: 0.2s; }
+  [data-reveal][data-delay="3"] { transition-delay: 0.3s; }
+  [data-reveal][data-delay="4"] { transition-delay: 0.4s; }
+  [data-reveal][data-delay="5"] { transition-delay: 0.5s; }
+
+  /* Cursor trail dot */
+  .trail-dot {
+    position: fixed; width: 6px; height: 6px; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, var(--fire-4), var(--fire-2) 60%, transparent);
+    z-index: 5; opacity: 0.8; mix-blend-mode: screen;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .topbar { padding: 16px 18px; }
+    .hero { padding: 100px 18px 100px; }
+    .bio { padding: 80px 18px 100px; }
+    .socials { grid-template-columns: 1fr; }
+    .lang-switch button { padding: 6px 10px; font-size: 10px; }
+    .brand-name { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-word">FoxFire</div>
+    <div class="loader-bar"><span></span></div>
+    <div class="loader-text" data-i18n="loading">Разжигаем огонёк…</div>
+  </div>
+</div>
+
+<!-- AMBIENT -->
+<div class="bg-ambient"></div>
+<div class="grain"></div>
+<div class="embers" id="embers"></div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-glyph">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2 C9 7 6 9 6 13 C6 17 9 20 12 20 C15 20 18 17 18 13 C18 10 16 8 15 5 C14 8 12 9 11 10 C11 7 12 5 12 2Z" fill="#1a0a0c"/>
+        <path d="M12 11 C10.5 13.5 9.5 15 10 17 C10.5 18.5 11.5 19 12 18 C12.5 19 13.5 18.5 14 17 C14.5 15 13.5 13.5 12 11Z" fill="#ff5e1f"/>
+      </svg>
+    </div>
+    <div class="brand-name">Fox<span>Fire</span></div>
+  </div>
+
+  <nav class="lang-switch" id="langSwitch">
+    <button data-lang="ru" class="active">RU</button>
+    <button data-lang="en">EN</button>
+    <button data-lang="de">DE</button>
+    <button data-lang="fyr">фыр</button>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-grid">
+    <div class="hero-left">
+      <div class="eyebrow" data-reveal data-i18n="eyebrow">VRChat · YouTube · Стримы</div>
+      <h1 class="hero-title" data-reveal data-delay="1">
+        <span data-i18n="hero1">Привет, я</span><br/>
+        <span class="fire-word boop-target">FoxFire</span>
+      </h1>
+      <p class="hero-sub" data-reveal data-delay="2" data-i18n="hero_sub">
+        Огненный лис из VRChat. Нарезаю стримы PROGDY, снимаю клипы и пародии прямо из виртуальной реальности.
+      </p>
+
+      <div class="socials" data-reveal data-delay="3">
+        <!-- YouTube -->
+        <a class="social" href="https://www.youtube.com/@FoxFire_UwU" target="_blank" rel="noopener"
+           style="--brand-a:#ff0033;--brand-b:#cc0028;" data-hover>
+          <div class="social-icon" style="color:#ff3344;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
+          </div>
+          <div class="social-text">
+            <div class="social-name">YouTube</div>
+            <div class="social-handle">@FoxFire_UwU</div>
+          </div>
+          <svg class="social-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round"/>
+          </svg>
+        </a>
+
+        <!-- Telegram -->
+        <a class="social" href="https://t.me/foxfire_uwu" target="_blank" rel="noopener"
+           style="--brand-a:#229ed9;--brand-b:#1881b3;" data-hover>
+          <div class="social-icon" style="color:#42b8e8;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.6 8.2l-1.9 8.8c-.1.6-.5.8-1.1.5l-3-2.2-1.4 1.4c-.2.2-.3.3-.6.3l.2-3 5.5-5c.2-.2 0-.3-.3-.1l-6.8 4.3-2.9-.9c-.6-.2-.7-.6.1-.9l11.4-4.4c.5-.2 1 .1.8.9z"/></svg>
+          </div>
+          <div class="social-text">
+            <div class="social-name">Telegram</div>
+            <div class="social-handle">@foxfire_uwu</div>
+          </div>
+          <svg class="social-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round"/>
+          </svg>
+        </a>
+
+        <!-- Discord -->
+        <a class="social" href="https://discord.gg/GucMfZezJJ" target="_blank" rel="noopener"
+           style="--brand-a:#5865f2;--brand-b:#404eed;" data-hover>
+          <div class="social-icon" style="color:#7983f5;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.5 3l-.2.4a18 18 0 0 0-6.6 0L8.5 3a19.7 19.7 0 0 0-4.8 1.4A20.4 20.4 0 0 0 .2 16.4 19.9 19.9 0 0 0 6.2 19.4l1.2-1.7a13 13 0 0 1-2-1l.5-.4a14.2 14.2 0 0 0 12.2 0l.5.4a13 13 0 0 1-2 1l1.2 1.7a19.9 19.9 0 0 0 6-3 20.3 20.3 0 0 0-3.5-12zM8.1 14.4c-1.2 0-2.1-1.1-2.1-2.4S6.9 9.6 8.1 9.6s2.2 1.1 2.1 2.4-1 2.4-2.1 2.4zm7.8 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4-.9 2.4-2.1 2.4z"/></svg>
+          </div>
+          <div class="social-text">
+            <div class="social-name">Discord</div>
+            <div class="social-handle" data-i18n="discord_handle">сервер UwU</div>
+          </div>
+          <svg class="social-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round"/>
+          </svg>
+        </a>
+
+        <!-- X / Twitter -->
+        <a class="social" href="https://x.com/FoxFireUwU" target="_blank" rel="noopener"
+           style="--brand-a:#1a1a1a;--brand-b:#444;" data-hover>
+          <div class="social-icon" style="color:#fff;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </div>
+          <div class="social-text">
+            <div class="social-name">X</div>
+            <div class="social-handle">@FoxFireUwU</div>
+          </div>
+          <svg class="social-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 17L17 7M9 7h8v8" stroke-linecap="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-portrait" data-reveal data-delay="2">
+      <div class="portrait-frame-corner tl"></div>
+      <div class="portrait-frame-corner tr"></div>
+      <div class="portrait-frame-corner bl"></div>
+      <div class="portrait-frame-corner br"></div>
+      <img src="assets/foxfire-portrait.png" alt="FoxFire" id="portraitImg"/>
+      <div class="portrait-tag">
+        <div>
+          <div class="portrait-meta" data-i18n="portrait_meta">Огненный лис · фурри</div>
+          <div class="portrait-name boop-target">FoxFire</div>
+        </div>
+        <div class="portrait-meta uwu-trigger">UwU</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="scroll-cta" onclick="document.getElementById('bio').scrollIntoView({behavior:'smooth'})" aria-label="scroll">
+    <div class="scroll-ring">
+      <svg width="18" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 4v16M6 14l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span data-i18n="scroll_cta">кто такой foxfire</span>
+  </button>
+</section>
+
+<!-- BIO -->
+<section class="bio" id="bio">
+  <div class="bio-grid">
+    <div class="bio-images" data-reveal>
+      <div class="bio-img main"><img src="assets/foxfire-hoodie.png" alt="FoxFire in hoodie"/></div>
+      <div class="bio-img tag"><img src="assets/foxfire-bio-closeup.png" alt="FoxFire closeup"/></div>
+      <div class="bio-img acc"><img src="assets/foxfire-bio-fire.png" alt="FoxFire fire"/></div>
+    </div>
+
+    <div class="bio-content">
+      <div class="eyebrow" data-reveal data-i18n="bio_eyebrow">обо мне</div>
+      <h2 class="bio-title" data-reveal data-delay="1">
+        <span data-i18n="bio_title1">Просто</span> <em data-i18n="bio_title2">огненный лис</em><br/>
+        <span data-i18n="bio_title3">с большим сердцем.</span>
+      </h2>
+      <p class="bio-text" data-reveal data-delay="2">
+        <span data-i18n="bio_p1">Я <strong>FoxFire</strong> — занимаюсь нарезками стримера-фурри <strong>PROGDY</strong>, собираю лучшие моменты и угарные сценки в короткие видео.</span>
+      </p>
+      <p class="bio-text" data-reveal data-delay="3">
+        <span data-i18n="bio_p2">Параллельно веду свой канал на YouTube, провожу собственные трансляции и снимаю клипы, пародии и просто весёлые видео прямо <strong>в VRChat</strong> — и всё это выкладываю на <strong>YouTube</strong>. Заходи, будет тепло.</span>
+      </p>
+
+      <div class="bio-stats" data-reveal data-delay="4">
+        <div class="bio-stat">
+          <div class="bio-stat-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4zM3 12l9 4 9-4M3 17l9 4 9-4" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="bio-stat-label" data-i18n="stat1_l">Контент</div>
+          <div class="bio-stat-value" data-i18n="stat1_v">Нарезки PROGDY</div>
+        </div>
+        <div class="bio-stat">
+          <div class="bio-stat-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="bio-stat-label" data-i18n="stat2_l">Стримы</div>
+          <div class="bio-stat-value" data-i18n="stat2_v">Иногда в эфире</div>
+        </div>
+        <div class="bio-stat">
+          <div class="bio-stat-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
+          </div>
+          <div class="bio-stat-label" data-i18n="stat3_l">Платформа</div>
+          <div class="bio-stat-value">YouTube</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOT -->
+<footer class="foot">
+  <div class="foot-divider"></div>
+  <div class="foot-text" data-i18n="foot_made">Сделано с <span class="heart">♥</span> и огоньком · FoxFire 2026</div>
+  <div class="foot-hint" data-i18n="foot_hint">Подсказка: тыкни в <span>FoxFire</span> или <span>UwU</span> несколько раз 🔥</div>
+</footer>
+
+<!-- UwU easter egg -->
+<div id="uwu" aria-hidden="true">
+  <div class="uwu-sub">FoxFire</div>
+  <div class="uwu-main">UwU</div>
+</div>
+
+<!-- BOOP -->
+<div id="boop" aria-hidden="true">
+  <div class="boop-sub">FoxFire</div>
+  <div class="boop-text">БУП</div>
+</div>
+
+<script>
+/* ====================== i18n ====================== */
+const STR = {
+  ru: {
+    loading: 'Разжигаем огонёк…',
+    eyebrow: 'VRChat · YouTube · Стримы',
+    hero1: 'Привет, я',
+    hero_sub: 'Огненный лис из VRChat. Нарезаю стримы PROGDY, снимаю клипы и пародии прямо из виртуальной реальности.',
+    discord_handle: 'сервер UwU',
+    portrait_meta: 'Огненный лис · фурри',
+    scroll_cta: 'кто такой foxfire',
+    bio_eyebrow: 'обо мне',
+    bio_title1: 'Просто',
+    bio_title2: 'огненный лис',
+    bio_title3: 'с большим сердцем.',
+    bio_p1: 'Я <strong>FoxFire</strong> — занимаюсь нарезками стримера-фурри <strong>PROGDY</strong>, собираю лучшие моменты и угарные сценки в короткие видео.',
+    bio_p2: 'Параллельно веду свой канал на YouTube, провожу собственные трансляции и снимаю клипы, пародии и просто весёлые видео прямо <strong>в VRChat</strong> — и всё это выкладываю на <strong>YouTube</strong>. Заходи, будет тепло.',
+    stat1_l: 'Контент',     stat1_v: 'Нарезки PROGDY',
+    stat2_l: 'Стримы',      stat2_v: 'Иногда в эфире',
+    stat3_l: 'Платформа',
+    foot_made: 'Сделано с <span class="heart">♥</span> и огоньком · FoxFire 2026',
+    foot_hint: 'Подсказка: тыкни в <span>FoxFire</span> или <span>UwU</span> несколько раз 🔥',
+    boop_sub: 'FoxFire'
+  },
+  en: {
+    loading: 'Lighting the fire…',
+    eyebrow: 'VRChat · YouTube · Streams',
+    hero1: 'Hey, I\'m',
+    hero_sub: 'A fiery little fox from VRChat. I cut up PROGDY streams and film clips & parodies straight from virtual reality.',
+    discord_handle: 'UwU server',
+    portrait_meta: 'Fiery fox · furry',
+    scroll_cta: 'who is foxfire',
+    bio_eyebrow: 'about me',
+    bio_title1: 'Just a',
+    bio_title2: 'fiery little fox',
+    bio_title3: 'with a big heart.',
+    bio_p1: 'I\'m <strong>FoxFire</strong> — I make highlight cuts of the furry streamer <strong>PROGDY</strong>, capturing the best moments and funniest scenes in short videos.',
+    bio_p2: 'On the side I run my own YouTube channel, stream from time to time, and film clips, parodies and silly videos right inside <strong>VRChat</strong> — and post all of it on <strong>YouTube</strong>. Come hang out, it\'s warm here.',
+    stat1_l: 'Content',     stat1_v: 'PROGDY cuts',
+    stat2_l: 'Streams',     stat2_v: 'Live sometimes',
+    stat3_l: 'Platform',
+    foot_made: 'Made with <span class="heart">♥</span> and a little fire · FoxFire 2026',
+    foot_hint: 'Hint: tap <span>FoxFire</span> or <span>UwU</span> a few times 🔥',
+    boop_sub: 'FoxFire'
+  },
+  de: {
+    loading: 'Wir entfachen das Feuer…',
+    eyebrow: 'VRChat · YouTube · Streams',
+    hero1: 'Hi, ich bin',
+    hero_sub: 'Ein feuriger kleiner Fuchs aus VRChat. Ich schneide PROGDY-Streams und drehe Clips & Parodien direkt aus der virtuellen Realität.',
+    discord_handle: 'UwU-Server',
+    portrait_meta: 'Feuriger Fuchs · Furry',
+    scroll_cta: 'wer ist foxfire',
+    bio_eyebrow: 'über mich',
+    bio_title1: 'Einfach ein',
+    bio_title2: 'feuriger Fuchs',
+    bio_title3: 'mit großem Herz.',
+    bio_p1: 'Ich bin <strong>FoxFire</strong> — ich mache Highlight-Cuts des Furry-Streamers <strong>PROGDY</strong> und packe die besten Momente und lustigsten Szenen in kurze Videos.',
+    bio_p2: 'Nebenbei betreibe ich meinen eigenen YouTube-Kanal, streame ab und zu und drehe Clips, Parodien und alberne Videos direkt in <strong>VRChat</strong> — und lade alles auf <strong>YouTube</strong> hoch. Komm vorbei, hier ist es warm.',
+    stat1_l: 'Inhalt',      stat1_v: 'PROGDY-Cuts',
+    stat2_l: 'Streams',     stat2_v: 'Manchmal live',
+    stat3_l: 'Plattform',
+    foot_made: 'Gemacht mit <span class="heart">♥</span> und ein bisschen Feuer · FoxFire 2026',
+    foot_hint: 'Tipp: tippe <span>FoxFire</span> oder <span>UwU</span> ein paar Mal an 🔥',
+    boop_sub: 'FoxFire'
+  },
+  fyr: {
+    loading: 'Фыр фыр фыр…',
+    eyebrow: 'Фыр · Фыр · Фыр',
+    hero1: 'Фыр фыр',
+    hero_sub: 'Фыр фыр фыр фыр-фыр, фыр фыр-фыр фыр фыр-фыр фыр фыр фыр-фыр. Фыр!',
+    discord_handle: 'фыр-сервер',
+    portrait_meta: 'фыр-фыр · фыр',
+    scroll_cta: 'фыр фыр foxfire',
+    bio_eyebrow: 'фыр-фыр',
+    bio_title1: 'Просто',
+    bio_title2: 'фыр-фыр',
+    bio_title3: 'с большим фыр.',
+    bio_p1: 'Я <strong>FoxFire</strong> — фыр фыр-фыр <strong>PROGDY</strong>, фыр фыр-фыр фыр фыр-фыр фыр.',
+    bio_p2: 'Фыр фыр-фыр YouTube, фыр-фыр фыр фыр фыр-фыр фыр-фыр <strong>в VRChat</strong> — фыр фыр на <strong>YouTube</strong>. Фыр фыр, фыр фыр!',
+    stat1_l: 'Фыр',         stat1_v: 'Фыр PROGDY',
+    stat2_l: 'Фыр',         stat2_v: 'Иногда фыр',
+    stat3_l: 'Фыр',
+    foot_made: 'Фыр-фыр с <span class="heart">♥</span> и фыр · FoxFire 2026',
+    foot_hint: 'Фыр: <span>фыр</span> в FoxFire или UwU несколько раз 🔥',
+    boop_sub: 'фыр'
+  }
+};
+
+const stat3_v = 'VRChat';
+
+function applyLang(lang) {
+  const dict = STR[lang] || STR.ru;
+  document.documentElement.lang = lang === 'fyr' ? 'ru' : lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) el.innerHTML = dict[key];
+  });
+  document.querySelectorAll('#langSwitch button').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  localStorage.setItem('foxfire-lang', lang);
+}
+
+document.querySelectorAll('#langSwitch button').forEach(b => {
+  b.addEventListener('click', () => applyLang(b.dataset.lang));
+});
+applyLang(localStorage.getItem('foxfire-lang') || 'ru');
+
+/* ====================== Loader ====================== */
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('loader').classList.add('hidden'), 1500);
+});
+
+/* ====================== Embers ====================== */
+(function makeEmbers() {
+  const box = document.getElementById('embers');
+  const N = 28;
+  for (let i = 0; i < N; i++) {
+    const e = document.createElement('div');
+    e.className = 'ember';
+    const dur = 6 + Math.random() * 9;
+    const delay = Math.random() * 14;
+    const size = 2 + Math.random() * 5;
+    const drift = (Math.random() - 0.5) * 220;
+    e.style.left = (Math.random() * 100) + '%';
+    e.style.width = size + 'px';
+    e.style.height = size + 'px';
+    e.style.animationDuration = dur + 's';
+    e.style.animationDelay = (-delay) + 's';
+    e.style.setProperty('--drift', drift + 'px');
+    box.appendChild(e);
+  }
+})();
+
+/* ====================== Reveal on scroll ====================== */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+/* ====================== Social hover spotlight ====================== */
+document.querySelectorAll('[data-hover]').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+    card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+  });
+});
+
+/* ====================== Cursor trail ====================== */
+const trailMax = 14;
+const trail = [];
+let mx = -100, my = -100;
+window.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+
+function tick() {
+  if (trail.length < trailMax) {
+    const d = document.createElement('div');
+    d.className = 'trail-dot';
+    document.body.appendChild(d);
+    trail.push({ el: d, x: mx, y: my, life: 0 });
+  }
+  trail.forEach((t, i) => {
+    t.life += 1;
+    const target = i === 0 ? { x: mx, y: my } : trail[i - 1];
+    t.x += (target.x - t.x) * 0.35;
+    t.y += (target.y - t.y) * 0.35;
+    t.el.style.transform = `translate(${t.x - 3}px, ${t.y - 3}px) scale(${1 - i/trailMax})`;
+    t.el.style.opacity = (1 - i/trailMax) * 0.6;
+  });
+  requestAnimationFrame(tick);
+}
+if (!matchMedia('(pointer: coarse)').matches) requestAnimationFrame(tick);
+
+/* ====================== UwU easter egg ====================== */
+let uwuClicks = 0;
+let uwuTimer = null;
+let uwuActive = false;
+const uwuEl = document.getElementById('uwu');
+const UWU_REQUIRED = 5;
+
+function triggerUwu() {
+  if (uwuActive) return;
+  uwuActive = true;
+
+  // background shower of UwU
+  const N = 26;
+  const drops = [];
+  for (let i = 0; i < N; i++) {
+    const d = document.createElement('div');
+    d.className = 'uwu-rain';
+    d.textContent = ['UwU','uwu','OwO','UwU','>w<','UwU'][i % 6];
+    const startX = Math.random() * 100;
+    const startY = -10 - Math.random() * 30;
+    const endY = 110 + Math.random() * 20;
+    const drift = (Math.random() - 0.5) * 30;
+    const size = 28 + Math.random() * 72;
+    const rot = (Math.random() - 0.5) * 50;
+    d.style.left = startX + 'vw';
+    d.style.top = startY + 'vh';
+    d.style.fontSize = size + 'px';
+    d.style.transform = `rotate(${rot}deg)`;
+    d.style.transition = `top ${1.6 + Math.random() * 1.4}s linear, left ${1.6 + Math.random() * 1.4}s linear, opacity 0.5s ease`;
+    d.style.transitionDelay = (Math.random() * 0.6) + 's';
+    uwuEl.appendChild(d);
+    drops.push({ el: d, endX: startX + drift, endY });
+  }
+
+  uwuEl.classList.add('show');
+  requestAnimationFrame(() => {
+    drops.forEach(d => {
+      d.el.style.opacity = '1';
+      d.el.style.top = d.endY + 'vh';
+      d.el.style.left = d.endX + 'vw';
+    });
+  });
+
+  setTimeout(() => {
+    drops.forEach(d => d.el.style.opacity = '0');
+  }, 2200);
+
+  setTimeout(() => {
+    uwuEl.classList.remove('show');
+    drops.forEach(d => d.el.remove());
+    uwuActive = false;
+    uwuClicks = 0;
+  }, 2900);
+}
+
+document.querySelectorAll('.uwu-trigger').forEach(el => {
+  el.style.cursor = 'pointer';
+  el.style.userSelect = 'none';
+  el.addEventListener('click', () => {
+    uwuClicks++;
+    el.animate(
+      [{ transform: 'scale(1)' }, { transform: 'scale(1.25) rotate(6deg)' }, { transform: 'scale(1)' }],
+      { duration: 320, easing: 'cubic-bezier(.2,1.6,.3,1)' }
+    );
+    if (uwuTimer) clearTimeout(uwuTimer);
+    uwuTimer = setTimeout(() => { uwuClicks = 0; }, 2000);
+    if (uwuClicks >= UWU_REQUIRED) {
+      triggerUwu();
+    }
+  });
+});
+
+/* ====================== BOOP easter egg ====================== */
+let boopClicks = 0;
+let boopTimer = null;
+let boopActive = false;
+const boopEl = document.getElementById('boop');
+const REQUIRED = 5;
+
+function triggerBoop() {
+  if (boopActive) return;
+  boopActive = true;
+  const dict = STR[localStorage.getItem('foxfire-lang') || 'ru'] || STR.ru;
+  boopEl.querySelector('.boop-sub').textContent = dict.boop_sub || 'FoxFire';
+
+  // particles
+  const N = 30;
+  const particles = [];
+  for (let i = 0; i < N; i++) {
+    const p = document.createElement('div');
+    p.className = 'boop-particle';
+    const angle = (i / N) * Math.PI * 2 + Math.random() * 0.6;
+    const dist = 200 + Math.random() * 320;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist;
+    const size = 6 + Math.random() * 18;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = '50%';
+    p.style.top = '50%';
+    p.style.transition = 'all 1.2s cubic-bezier(.2,.7,.3,1)';
+    p.style.transform = 'translate(-50%,-50%)';
+    p.style.opacity = '1';
+    boopEl.appendChild(p);
+    particles.push({ el: p, dx, dy });
+  }
+
+  boopEl.classList.add('show');
+  requestAnimationFrame(() => {
+    particles.forEach(p => {
+      p.el.style.transform = `translate(calc(-50% + ${p.dx}px), calc(-50% + ${p.dy}px)) scale(0.2)`;
+      p.el.style.opacity = '0';
+    });
+  });
+
+  setTimeout(() => {
+    boopEl.classList.remove('show');
+    particles.forEach(p => p.el.remove());
+    boopActive = false;
+    boopClicks = 0;
+  }, 1700);
+}
+
+document.querySelectorAll('.boop-target').forEach(el => {
+  el.style.cursor = 'pointer';
+  el.style.userSelect = 'none';
+  el.addEventListener('click', () => {
+    boopClicks++;
+    el.animate(
+      [{ transform: 'scale(1)' }, { transform: 'scale(1.12) rotate(-2deg)' }, { transform: 'scale(1)' }],
+      { duration: 280, easing: 'cubic-bezier(.2,1.4,.3,1)' }
+    );
+    if (boopTimer) clearTimeout(boopTimer);
+    boopTimer = setTimeout(() => { boopClicks = 0; }, 2000);
+    if (boopClicks >= REQUIRED) {
+      triggerBoop();
+    }
+  });
+});
+
+/* ====================== Parallax on portrait ====================== */
+const portrait = document.querySelector('.hero-portrait');
+if (portrait && !matchMedia('(pointer: coarse)').matches) {
+  window.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 6;
+    const y = (e.clientY / window.innerHeight - 0.5) * 4;
+    portrait.style.transform = `perspective(1200px) rotateY(${-6 + x}deg) rotateX(${2 - y}deg)`;
+  });
+}
+</script>
+
+</body>
+</html>
